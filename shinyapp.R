@@ -29,10 +29,11 @@ runApp(shinyApp(
     
     # df_to_update <- eventReactive(input$Update1,{
     #   withProgress(message ='Exchanging Data with Google Drive', 
-    #                detail='This communication may take 60 seconds, please wait for screen to refresh.', value=0)
+    #                detail='This communication may take 60 seconds, please wait for screen to refresh.', value=0
       
   observeEvent(input$file1, {
-    
+    withProgress(message ='Exchanging Data with Google Drive', 
+                   detail='This communication may take 60 seconds, please wait for screen to refresh.', value=0, {
     clinic_name <- input$choose_clinic
     #retrieve new clinic data 
     df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
@@ -109,8 +110,8 @@ runApp(shinyApp(
       #now create a melted, reduced version of the data frame for manipulation (remove RepMonth variable)
       df_new1 <- melt(df_new[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
       values$df_data <- df_new1               
-      
-    })
+    })  
+   })
     
     
     
