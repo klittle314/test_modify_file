@@ -25,28 +25,17 @@ runApp(shinyApp(
   server = (function(input, output) {
     values <- reactiveValues(df_data = df_melt)
     
-    df_to_update <- eventReactive(input$Update1,{
-      withProgress(message ='Exchanging Data with Google Drive', 
-                   detail='This communication may take 60 seconds, please wait for screen to refresh.', value=0)
-      clinic_name <- input$choose_clinic
-      # #retrieve google sheet data
-      # gsobj <- gs_key(x=gskey2)
-      # #need to turn this into ws=5 when functional
-      # df_master1 <- gs_read(ss=gsobj,ws=5)
-      # df_master1 <- as.data.frame(df_master1)
+    
+    
+    # df_to_update <- eventReactive(input$Update1,{
+    #   withProgress(message ='Exchanging Data with Google Drive', 
+    #                detail='This communication may take 60 seconds, please wait for screen to refresh.', value=0)
       
-      
-      #sort df_master1 to have clinics in alpha order (contiguous records), and date ordered within clinic
-      # df_master1 <- df_master1[order(df_master1$ClinicName,df_master1$RepMonth),] 
-      # #rewrite Google sheet to get correct order for subsequent processing
-      # gs_ws_delete(ss=gsobj,ws=4)
-      # gsobj <- gs_key(x=gskey2)
-      # gs_ws_new(ss=gsobj,ws="Summary_Data",col_extent=ncol(df_master1),input=df_master1)
-      
-      #retrieve new clinic data
-      df_clinic <- getClinicData()
-      # #diagnostic
-      # cat(file=stderr(),"clinic name",clinic_name,"\n")
+  observeEvent(input$file1, {
+    
+    clinic_name <- input$choose_clinic
+    #retrieve new clinic data 
+    df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
       
       #clean clinic data to our standards
       df_clinic <- clean_up_df1(df_clinic)
@@ -119,15 +108,13 @@ runApp(shinyApp(
       
       #now create a melted, reduced version of the data frame for manipulation (remove RepMonth variable)
       df_new1 <- melt(df_new[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
-      return(df_new1)                
+      values$df_data <- df_new1               
       
     })
     
-    observeEvent(input$Update2, {
-      temp <- df_to_update()
-      values$df_data <- temp
-      
-    })
+    
+    
+    
     
     output$df_data_out <- renderDataTable(values$df_data)
   })
