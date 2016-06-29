@@ -14,9 +14,13 @@ runApp(shinyApp(
         fileInput('file1', 'Choose Excel File',
                   accept=c('.xlsx','.xls')), 
       
-     
-      actionButton("Update1", "Update the data file"),
-      actionButton("Update2", "Update display")
+        #drop down to select the Measure
+        htmlOutput("selectMeasures"),
+        
+        #drop down to select the Team
+        htmlOutput("selectTeam")
+      #actionButton("Update1", "Update the data file"),
+      #actionButton("Update2", "Update display")
       ),
     mainPanel(
       dataTableOutput("df_data_out")
@@ -113,7 +117,37 @@ runApp(shinyApp(
     })  
    })
     
-    
+  measure_choice <- reactive({
+    data <- values$df_data
+    if(!is.null(data)) {
+      levs <- levels(as.factor(data$Measure))
+      return(levs)
+    }
+  })
+  #
+  #
+  output$selectMeasures <- renderUI({
+    measure_choice1 <- measure_choice()
+    if(!is.null(measure_choice1)) {
+      selectInput("choose_Meas",label=h4("Choose measure"),choices=measure_choice1,width="100%")
+    }
+  })
+  
+  
+  team_choice <- reactive({
+    data <- values$df_data
+    if(!is.null(data)) {
+      levs <- sort(as.character(levels(as.factor(data$ClinicName))))
+      return(levs)
+    }
+  })
+  
+  output$selectTeam <- renderUI({
+    team_choice1 <- team_choice()
+    if(!is.null(team_choice1)) {
+      selectInput("choose_Team",label=h4("Choose team"),choices=team_choice1,width="100%")
+    }
+  })  
     
     
     
