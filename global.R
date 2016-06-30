@@ -21,7 +21,8 @@ clinic_list <- c("Clinic 1"="C1", "Clinic 2"= "C2", "Clinic 3"="C3", "Clinic 4"=
 
 #load the googlesheet
 #gskey2 <- c("1dN9rj--OEghw7DdOO0f0y1dcObm2GQwvpbEPWcvAZUU")
-gskey2 <- c("1m6oVBbHRKb3UuDyImH1Tvl2nUXkQTwLi3Le2kwsciC4")
+#gskey2 <- c("1m6oVBbHRKb3UuDyImH1Tvl2nUXkQTwLi3Le2kwsciC4")
+gskey2 <- c("1tOYZfT6ZGRw06UabraijdgXtPu_J4a6oifvlWwRfsXg")
 gsobj <- gs_key(x=gskey2)
 
 
@@ -30,6 +31,7 @@ gsobj <- gs_key(x=gskey2)
 #functions expecting a dataframe
 
 df_master1 <- as.data.frame(gs_read(ss=gsobj,ws="Summary_Data"))
+df_master1 <- clean_up_df1(df_master1)
 #sort df_master1 to have clinics in alpha order (contiguous records), and date ordered within clinic
 #in case data have been appended in earlier sessions
 df_master1 <- df_master1[order(df_master1$ClinicName,df_master1$RepMonth),] 
