@@ -36,9 +36,22 @@ reverse_order <- function(x){
   rev_order <- -1*mean(x)
 }
 
+#return a dataframe where rows with all NA in a set of columns are eliminated, the column set defined by cindex 
+remove_NA_rows <- function(df,cindex) {
+  dfa <- df[,cindex]
+  names_use <- names(dfa)
+  dfb <- as.data.frame(t(dfa))
+  rm_idx <- sapply(dfb,function(x) all(is.na(x)))
+  dfc <- dfb[,!rm_idx]
+  dfd <- as.data.frame(t(dfc))
+  #names(df_out) <- names_use
+  row_ID <- as.integer(gsub("V","",row.names(dfd)))
+  df_out <- df[row_ID,]
+}
 
 #function to clean up the dataframe loaded from the spreadsheet  THIS CAN BE GENERALIZED to handle arbitrary column assignment
 # at very least to pass index values of columns that are per cents for checking.
+# on 30 June modified to remove rows that have all NA in the measure columns
 clean_up_df1 <- function(df) {
   df2 <- as.data.frame(lapply(df,make_NA), stringsAsFactors = FALSE)
   names(df2) <- gsub("-","_",names(df2))
@@ -52,6 +65,7 @@ clean_up_df1 <- function(df) {
   df2$MeasMonth <- MeasMonth
   #put any per cents greater than 100 as NA
   df2[,c(seq(6,30,3),42)] <- sapply(df2[,c(seq(6,30,3),42)],check_percents)
+  df2 <- remove_NA_rows(df2,c(4:42))
   return(df2)
 }
 
