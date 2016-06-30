@@ -31,10 +31,11 @@ gsobj <- gs_key(x=gskey2)
 #functions expecting a dataframe
 
 df_master1 <- as.data.frame(gs_read(ss=gsobj,ws="Summary_Data"))
-df_master1 <- clean_up_df1(df_master1)
+#assumes the Summary Data has already been cleaned--starts in a clean state.
+#df_master1 <- clean_up_df1(df_master1)
 #sort df_master1 to have clinics in alpha order (contiguous records), and date ordered within clinic
 #in case data have been appended in earlier sessions
 df_master1 <- df_master1[order(df_master1$ClinicName,df_master1$RepMonth),] 
 
-#now melt the df for manipulation
+#now melt the df for manipulation, omitting the Reporting Month, column 2
 df_melt <- melt(df_master1[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
