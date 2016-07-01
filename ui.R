@@ -23,7 +23,12 @@
       #actionButton("Update2", "Update display")
       ),
     mainPanel(
-      dataTableOutput("df_data_out")
+      tabsetPanel(type="tabs",
+                  
+        tabPanel("table",dataTableOutput("df_data_out")),
+        tabPanel("Measure by Team",
+                 plotOutput("measure_plot",height="800px"))
+      )
     )
   )))
   
