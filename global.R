@@ -17,7 +17,7 @@ library(googlesheets)
 library(zoo)
 source("helper.R")
 
-clinic_list <- c("Clinic 1"="C1", "Clinic 2"= "C2", "Clinic 3"="C3", "Clinic 4"="C4","Clinic 5"="C5")
+clinic_list <- c("C1"="C1", "C2"= "C2", "C3"="C3", "C4"="C4","C5"="C5")
 
 #load the googlesheet
 #gskey2 <- c("1dN9rj--OEghw7DdOO0f0y1dcObm2GQwvpbEPWcvAZUU")
@@ -37,5 +37,9 @@ df_master1 <- as.data.frame(gs_read(ss=gsobj,ws="Summary_Data"))
 #in case data have been appended in earlier sessions
 df_master1 <- df_master1[order(df_master1$ClinicName,df_master1$RepMonth),] 
 
-#now melt the df for manipulation, omitting the Reporting Month, column 2
+#now melt the df for manipulation, omitting the Reporting Month, column 2 and setting up for plotting
 df_melt <- melt(df_master1[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
+
+df_melt$ClinicName <- as.factor(df_melt$ClinicName)
+#append measure type 
+df_melt$MeasType <- measure_type_maker(df_melt)
