@@ -86,6 +86,9 @@ shinyServer(function(input, output) {
                    
                    #now create a melted, reduced version of the data frame for manipulation (remove RepMonth variable)
                    df_new1 <- melt(df_new[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
+                   df_new1$ClinicName <- as.factor(df_new1$ClinicName)
+                   #append measure type column
+                   df_new1$MeasType <- measure_type_maker((df_new1))
                    values$df_data <- df_new1               
                  })  
   })
@@ -122,7 +125,14 @@ shinyServer(function(input, output) {
     }
   })  
   
-  
+  output$measure_plot <- renderPlot({
+    measure <- input$choose_Meas
+    data <-  values$df_data
+    if(!is.null(data) && !is.null(measure)) {
+      p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=1)
+      print(p_m2)
+    }
+  })
   
   output$df_data_out <- renderDataTable(values$df_data)
 })
