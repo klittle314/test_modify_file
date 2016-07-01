@@ -52,6 +52,7 @@ remove_NA_rows <- function(df,cindex) {
 #function to clean up the dataframe loaded from the spreadsheet  THIS CAN BE GENERALIZED to handle arbitrary column assignment
 # at very least to pass index values of columns that are per cents for checking.
 # on 30 June modified to remove rows that have all NA in the measure columns
+# assumes that the input file will always have 36 data rows and four headers.
 clean_up_df1 <- function(df) {
   df2 <- as.data.frame(lapply(df,make_NA), stringsAsFactors = FALSE)
   names(df2) <- gsub("-","_",names(df2))
@@ -65,12 +66,20 @@ clean_up_df1 <- function(df) {
   df2$MeasMonth <- MeasMonth
   #put any per cents greater than 100 as NA
   df2[,c(seq(6,30,3),42)] <- sapply(df2[,c(seq(6,30,3),42)],check_percents)
+  #remove all rows with all cells NA for the measure columns 4 to 42
   df2 <- remove_NA_rows(df2,c(4:42))
   return(df2)
 }
 
 
-#melt the wide data frame into a long data frame
+#function to append a measure type column to the melted data frame
+measure_type_maker <- function(df){
+  meastype <- c(rep("M",nrow(df)))
+  meastype[grep("_N",df$Measure)] <- "N"
+  meastype[grep("_D",df$Measure)] <- "D"
+  meastype[grep("Goal",df$Measure)] <- "Goal"
+  return(meastype)
+}
 
 #after clean up, reorder the data frame using the median total population for plotting facets in population order
 reorder_df <- function(df) {
@@ -232,53 +241,60 @@ p_by_team <- function(df,Site_ID,Series_name,meas_type,x_axis_lab){
 
 # teams by measure....issue may be the number of team series?  allow value of nrows in facet plot to be variable
 # to generalize.  Make it an input on the user interface for more general use.
-p_by_measure <- function(df,MName,y_goal,p_nrow){
+#df is melted df, y-goal will need to be extracted from the file, p_nrow is the number of rows in the facet plot 
+p_by_measure <- function(df,MName,p_nrow){
   
-  dfB <- droplevels(df[df$Measure_Name==MName & df$Series.Name=="Total Population",])
-  #   y_goal <- df_measure[df_measure$Measure_Name==MName,c("Goal")]
+  dfB <- droplevels(df[df$Measure==MName,])
   
-  if(dfB$Measure_Type[1]=="M"){
-    dfB$Value <- 100*dfB$Value
-    y_axis_lab <- "Per cent"
-    #       y_goal <- measure_goal
-  } else {
+  #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
+  if(dfB$MeasType[1]=="M" | dfB$Measure[1]=="OPM1"){
+    y_axis_lab <- "per cent"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(dfB$MeasType[1]=="N" | dfB$MeasType[1]=="D"){
     y_axis_lab <- "Count"
-    #       y_goal <- measure_goal
+  } else if(MeasName=="OPM2") {
+    y_axis_lab <- "$/Hr"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(MeasName=="OPM3") {
+    y_axis_lab <- "Encounters/Hr"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(MeasName=="OPM4") {
+    y_axis_lab <- "$/Visit"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
   }
   
   #create medians
-  med_B <- as.vector(tapply(dfB$Value,dfB$SiteID,median,na.rm=TRUE))
-  SiteID <- levels(dfB$SiteID)
-  df.hlines <- data.frame(SiteID,med_B)
+  med_B <- as.vector(tapply(dfB$value,dfB$ClinicName,median,na.rm=TRUE))
+  ClinicName <- levels(dfB$ClinicName)
+  df.hlines <- data.frame(ClinicName,med_B)
   
-  #create goals
-  ygoal <- rep(y_goal,length(levels(dfB$SiteID)))
-  SiteID <- levels(dfB$SiteID)
-  df.goals_hlines <- data.frame(SiteID,ygoal)
   
   #create facet plot
-  p2 <- ggplot(dfB,aes(x=Extract.End.Date,y=Value))+
+  p2 <- ggplot(dfB,aes(x=MeasMonth,y=value))+
     theme_bw()+
-    facet_wrap(~SiteID,nrow=p_nrow)+
+    facet_wrap(~ClinicName,nrow=p_nrow)+
     geom_point(size=2.5)+
     geom_line()+
     ylab(y_axis_lab)+
     xlab("Date") +
+    xlim(as.Date("2016-01-01"),as.Date("2017-7-01"))+
     theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
   
   
   p21 <- p2 + geom_hline(aes(yintercept=med_B),data=df.hlines,lty=2)
-  if(dfB$Measure_Type[1]=="M"){
-    p31 <- p21 + geom_hline(aes(yintercept=ygoal), data=df.goals_hlines,
-                            lty=1,colour="green")+
-      ggtitle(paste0(MName," by Sites (Total Population used for each Site)
+  if(dfB$MeasType[1]=="M"){
+    p31 <- p21 + geom_line(aes(x=MeasMonth,y=goal), 
+                           lty=1,colour="green")+
+      ggtitle(paste0(MName," by Clinic
                      Series median: dashed line; Goal: solid line."))
     
   } else {
-    p31 <- p21 + ggtitle(paste0(MName," by Sites (Total Population used for each Site)
+    p31 <- p21 + ggtitle(paste0(MName," by Clinic 
                                 Series median dashed line."))
   } 
   return(p31)
-  
-  
-}
+ }
