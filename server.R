@@ -89,6 +89,8 @@ shinyServer(function(input, output) {
                    df_new1$ClinicName <- as.factor(df_new1$ClinicName)
                    #append measure type column
                    df_new1$MeasType <- measure_type_maker((df_new1))
+                   #order the clinics by PM1_D values, largest to smallest
+                   df_new1 <- reorder_df(df_new1)
                    values$df_data <- df_new1               
                  })  
   })
