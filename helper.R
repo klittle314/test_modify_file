@@ -81,24 +81,84 @@ measure_type_maker <- function(df){
   return(meastype)
 }
 
-#after clean up, reorder the data frame using the median total population for plotting facets in population order
+
+
+# function to plot teams by measure....issue may be the number of team series?  allow value of nrows in facet plot to be variable
+# to generalize.  Make it an input on the user interface for more general use.
+#df is melted df, y-goal will need to be extracted from the file, p_nrow is the number of rows in the facet plot 
+p_by_measure <- function(df,MName,p_nrow){
+  
+  dfB <- droplevels(df[df$Measure==MName,])
+  
+  #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
+  if(dfB$MeasType[1]=="M" | dfB$Measure[1]=="OPM1"){
+    y_axis_lab <- "per cent"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(dfB$MeasType[1]=="N" | dfB$MeasType[1]=="D"){
+    y_axis_lab <- "Count"
+  } else if(MeasName=="OPM2") {
+    y_axis_lab <- "$/Hr"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(MeasName=="OPM3") {
+    y_axis_lab <- "Encounters/Hr"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(MeasName=="OPM4") {
+    y_axis_lab <- "$/Visit"
+    y_goal_label <- paste0("Goal_",dfB$Measure[1])
+    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+  }
+  
+  #create medians
+  med_B <- as.vector(tapply(dfB$value,dfB$ClinicName,median,na.rm=TRUE))
+  ClinicName <- levels(dfB$ClinicName)
+  df.hlines <- data.frame(ClinicName,med_B)
+  
+  
+  #create facet plot
+  p2 <- ggplot(dfB,aes(x=MeasMonth,y=value))+
+    theme_bw()+
+    facet_wrap(~ClinicName,nrow=p_nrow)+
+    geom_point(size=2.5)+
+    geom_line()+
+    ylab(y_axis_lab)+
+    xlab("Date") +
+    xlim(as.Date("2016-01-01"),as.Date("2017-7-01"))+
+    theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
+  
+  
+  p21 <- p2 + geom_hline(aes(yintercept=med_B),data=df.hlines,lty=2)
+  if(dfB$MeasType[1]=="M"){
+    p31 <- p21 + geom_line(aes(x=MeasMonth,y=goal), 
+                           lty=1,colour="green")+
+      ggtitle(paste0(MName," by Clinic
+                     Series median: dashed line; Goal: solid line."))
+    
+  } else {
+    p31 <- p21 + ggtitle(paste0(MName," by Clinic 
+                                Series median dashed line."))
+  } 
+  return(p31)
+  }
+
+#after clean up, reorder the data frame using the median patient count in month (0-20 yrs) for plotting facets in population order
 reorder_df <- function(df) {
-  #create levels for the drop down boxes
-  #     team_name_lev <- levels(df2$SiteID)
-  #     measure_lev <- levels(df2$Measure)
-  #order the levels of sites by volume:  There may be a simpler way to do this than by brute force
-  df3 <- df[,c("Measure","SiteID","Series.Name","Value")]
-  df3A <- droplevels(df3[df3$Measure=="D1" & df3$Series.Name=="Total Population",])
-  #now get a function of the D1 values by SiteID, here we use medians.
-  pt_count <- unlist(by(df3A$Value,df3A$SiteID,FUN=median, na.rm=TRUE,simplify=FALSE))
-  #now create a dataframe with the SiteID levels, the vector of medians, and an integer sequence
-  df4 <- data.frame(levels(df3A$SiteID),pt_count,c(1:length(pt_count)))
-  names(df4) <- c("SiteID","med_pt_count","orig_order")
+  
+  #order the levels of clinics by volume:  There may be a simpler way to do this than by brute force
+  df3 <- df[,c("Measure","ClinicName","value")]
+  df3A <- droplevels(df3[df3$Measure=="PM1_D",])
+  #now get a function of the PM1_D values by Clinic, here we use medians.
+  pt_count <- unlist(by(df3A$value,df3A$ClinicName,FUN=median, na.rm=TRUE,simplify=FALSE))
+  #now create a dataframe with the Clinic levels, the vector of medians, and an integer sequence
+  df4 <- data.frame(levels(df3A$ClinicName),pt_count,c(1:length(pt_count)))
+  names(df4) <- c("ClinicName","med_pt_count","orig_order")
   #reorder the dataframe by descending order of the medians
   df4 <- df4[order(-df4[,2]),]
-  #now reorder the levels of the SiteID factor in the df2 dataframe, using the descending median order index from
+  #now reorder the levels of the ClinicName factor in the df2 dataframe, using the descending median order index from
   #dataframe df4
-  df$SiteID <- factor(df$SiteID,levels(df$SiteID)[df4$orig_order])
+  df$ClinicName <- factor(df$ClinicName,levels(df$ClinicName)[df4$orig_order])
   #     df$Measure_Name <- df$Measure
   #     levels(df$Measure_Name) <- levels(as.factor(df_mnames$Measure_Name))
   return(df)
@@ -106,20 +166,6 @@ reorder_df <- function(df) {
 
 
 
-# #function to replace ratios greater than 1 with NA
-# clean_up3_df <- function(df) {
-#   #replace ratios gt 1 with NA
-#   value_idx <- as.integer(row.names(df[df$Measure_Type=="M" & df$Value > 1,]))
-#   df$Value[value_idx] <- NA
-#   return(df)
-#   #replace 
-# }
-
-#function to delete duplicate records; retains records with smaller subscripts.
-#in the duplicated set.
-# clean_up4_df <- function(df) {
-#  df_out <- df[!duplicated(df[c(4,6,8)]),]
-# }
 
 
 #function to create a data table with ratio values greater than 1 or duplicated records for output and download
@@ -239,62 +285,3 @@ p_by_team <- function(df,Site_ID,Series_name,meas_type,x_axis_lab){
   return(p12)
 }    
 
-# teams by measure....issue may be the number of team series?  allow value of nrows in facet plot to be variable
-# to generalize.  Make it an input on the user interface for more general use.
-#df is melted df, y-goal will need to be extracted from the file, p_nrow is the number of rows in the facet plot 
-p_by_measure <- function(df,MName,p_nrow){
-  
-  dfB <- droplevels(df[df$Measure==MName,])
-  
-  #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
-  if(dfB$MeasType[1]=="M" | dfB$Measure[1]=="OPM1"){
-    y_axis_lab <- "per cent"
-    y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
-  } else if(dfB$MeasType[1]=="N" | dfB$MeasType[1]=="D"){
-    y_axis_lab <- "Count"
-  } else if(MeasName=="OPM2") {
-    y_axis_lab <- "$/Hr"
-    y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
-  } else if(MeasName=="OPM3") {
-    y_axis_lab <- "Encounters/Hr"
-    y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
-  } else if(MeasName=="OPM4") {
-    y_axis_lab <- "$/Visit"
-    y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
-  }
-  
-  #create medians
-  med_B <- as.vector(tapply(dfB$value,dfB$ClinicName,median,na.rm=TRUE))
-  ClinicName <- levels(dfB$ClinicName)
-  df.hlines <- data.frame(ClinicName,med_B)
-  
-  
-  #create facet plot
-  p2 <- ggplot(dfB,aes(x=MeasMonth,y=value))+
-    theme_bw()+
-    facet_wrap(~ClinicName,nrow=p_nrow)+
-    geom_point(size=2.5)+
-    geom_line()+
-    ylab(y_axis_lab)+
-    xlab("Date") +
-    xlim(as.Date("2016-01-01"),as.Date("2017-7-01"))+
-    theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
-  
-  
-  p21 <- p2 + geom_hline(aes(yintercept=med_B),data=df.hlines,lty=2)
-  if(dfB$MeasType[1]=="M"){
-    p31 <- p21 + geom_line(aes(x=MeasMonth,y=goal), 
-                           lty=1,colour="green")+
-      ggtitle(paste0(MName," by Clinic
-                     Series median: dashed line; Goal: solid line."))
-    
-  } else {
-    p31 <- p21 + ggtitle(paste0(MName," by Clinic 
-                                Series median dashed line."))
-  } 
-  return(p31)
- }
