@@ -75,6 +75,10 @@ clean_up_df1 <- function(df) {
 #function to append a measure type column to the melted data frame
 measure_type_maker <- function(df){
   meastype <- c(rep("M",nrow(df)))
+  meastype[grep("OPM1", df$Measure)] <- "OPM"
+  meastype[grep("OPM2", df$Measure)] <- "OPM"
+  meastype[grep("OPM3", df$Measure)] <- "OPM"
+  meastype[grep("OPM4", df$Measure)] <- "OPM"
   meastype[grep("_N",df$Measure)] <- "N"
   meastype[grep("_D",df$Measure)] <- "D"
   meastype[grep("Goal",df$Measure)] <- "Goal"
