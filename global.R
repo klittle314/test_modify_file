@@ -15,6 +15,7 @@ library(shinyapps)
 library(openxlsx)
 library(googlesheets) 
 library(zoo)
+library(shinyBS)
 source("helper.R")
 
 clinic_list <- c("C1"="C1", "C2"= "C2", "C3"="C3", "C4"="C4","C5"="C5")
