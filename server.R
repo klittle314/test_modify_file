@@ -83,11 +83,16 @@ shinyServer(function(input, output, session) {
                    df_new1$ClinicName <- as.factor(df_new1$ClinicName)
                    #append measure type column
                    df_new1$MeasType <- measure_type_maker((df_new1))
-                   values$df_data <- df_new1  
-      toggleModal(
-        session = session,
-        modalId = 'gs_data_exchange_modal',
-        toggle = 'close')                   
+
+                   #order the clinics by PM1_D values, largest to smallest
+                   df_new1 <- reorder_df(df_new1)
+                   values$df_data <- df_new1   
+
+                   toggleModal(
+                    session = session,
+                    modalId = 'gs_data_exchange_modal',
+                    toggle = 'close')               
+                 })  
   })
   
   measure_choice <- reactive({

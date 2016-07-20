@@ -26,17 +26,17 @@ restrict_percents <- function(x) {
   return(x)
 }
 
-#check columns that are nominally per cents between 0 and 100 and replace by NA
+#function to check columns that are nominally per cents between 0 and 100 and replace by NA
 check_percents <- function(col1) {
   col_out <- sapply(col1,restrict_percents)
 }
 
-#reorder factor by mean:  reverse order function:  may be useful for ordering levels for facet plots
+# functionto reorder factor by mean:  reverse order function:  may be useful for ordering levels for facet plots
 reverse_order <- function(x){
   rev_order <- -1*mean(x)
 }
 
-#return a dataframe where rows with all NA in a set of columns are eliminated, the column set defined by cindex 
+# function to return a dataframe where rows with all NA in a set of columns are eliminated, the column set defined by cindex 
 remove_NA_rows <- function(df,cindex) {
   dfa <- df[,cindex]
   names_use <- names(dfa)
@@ -72,174 +72,45 @@ clean_up_df1 <- function(df) {
 }
 
 
-#function to append a measure type column to the melted data frame
-measure_type_maker <- function(df){
-  meastype <- c(rep("M",nrow(df)))
-  meastype[grep("_N",df$Measure)] <- "N"
-  meastype[grep("_D",df$Measure)] <- "D"
-  meastype[grep("Goal",df$Measure)] <- "Goal"
-  return(meastype)
-}
-
-#after clean up, reorder the data frame using the median total population for plotting facets in population order
+#function to reorder ClinicName factor using the median patient count in month (0-20 yrs) for plotting facets in population order
 reorder_df <- function(df) {
-  #create levels for the drop down boxes
-  #     team_name_lev <- levels(df2$SiteID)
-  #     measure_lev <- levels(df2$Measure)
-  #order the levels of sites by volume:  There may be a simpler way to do this than by brute force
-  df3 <- df[,c("Measure","SiteID","Series.Name","Value")]
-  df3A <- droplevels(df3[df3$Measure=="D1" & df3$Series.Name=="Total Population",])
-  #now get a function of the D1 values by SiteID, here we use medians.
-  pt_count <- unlist(by(df3A$Value,df3A$SiteID,FUN=median, na.rm=TRUE,simplify=FALSE))
-  #now create a dataframe with the SiteID levels, the vector of medians, and an integer sequence
-  df4 <- data.frame(levels(df3A$SiteID),pt_count,c(1:length(pt_count)))
-  names(df4) <- c("SiteID","med_pt_count","orig_order")
+  
+  #order the levels of clinics by volume:  There may be a simpler way to do this than by brute force
+  df3 <- df[,c("Measure","ClinicName","value")]
+  df3A <- droplevels(df3[df3$Measure=="PM1_D",])
+  #now get a function of the PM1_D values by Clinic, here we use medians.
+  pt_count <- unlist(by(df3A$value,df3A$ClinicName,FUN=median, na.rm=TRUE,simplify=FALSE))
+  #now create a dataframe with the Clinic levels, the vector of medians, and an integer sequence
+  df4 <- data.frame(levels(df3A$ClinicName),pt_count,c(1:length(pt_count)))
+  names(df4) <- c("ClinicName","med_pt_count","orig_order")
   #reorder the dataframe by descending order of the medians
   df4 <- df4[order(-df4[,2]),]
-  #now reorder the levels of the SiteID factor in the df2 dataframe, using the descending median order index from
+  #now reorder the levels of the ClinicName factor in the df2 dataframe, using the descending median order index from
   #dataframe df4
-  df$SiteID <- factor(df$SiteID,levels(df$SiteID)[df4$orig_order])
+  df$ClinicName <- factor(df$ClinicName,levels(df$ClinicName)[df4$orig_order])
   #     df$Measure_Name <- df$Measure
   #     levels(df$Measure_Name) <- levels(as.factor(df_mnames$Measure_Name))
   return(df)
 }
 
 
-
-# #function to replace ratios greater than 1 with NA
-# clean_up3_df <- function(df) {
-#   #replace ratios gt 1 with NA
-#   value_idx <- as.integer(row.names(df[df$Measure_Type=="M" & df$Value > 1,]))
-#   df$Value[value_idx] <- NA
-#   return(df)
-#   #replace 
-# }
-
-#function to delete duplicate records; retains records with smaller subscripts.
-#in the duplicated set.
-# clean_up4_df <- function(df) {
-#  df_out <- df[!duplicated(df[c(4,6,8)]),]
-# }
-
-
-#function to create a data table with ratio values greater than 1 or duplicated records for output and download
-df_prblm_records <- function(df) {
-  #records with ratio values greater than 1
-  value_idx <- as.integer(row.names(df[df$Measure_Type=="M" & df$Value > 1,]))
-  df1x <- df[value_idx,]
-  df1x$issue <- rep("ratio error",times=nrow(df1x))
-  #records that are truly duplicated
-  #http://stackoverflow.com/questions/11369961/subset-with-unique-cases-based-on-multiple-columns 
-  df2x <- df[duplicated(df[c(4,6,7,8)]) | duplicated(df[c(4,6,7,8)], fromLast=TRUE),]
-  df2x$issue <- rep("site_time_measure duplication",times=nrow(df2x))
-  df_all <- rbind.data.frame(df1x,df2x)
-  return(df_all)
-}
-
-#function to replace NA in the Series.Name reconstruction in the next function
-replace_NA <- function(x){
-  if(is.na(x)){
-    x <- ""
-  } else {
-    x <- x
-  }
-}
-
-#function to assign M variables NA if the corresponding Denominator is zero and rebuild the data frame for plotting
-dfmake_M_NA <- function(df) {
-  #remove records that have 0 in denominator and a value reported for the corresponding measure ratio M
-  list_pairs <- list(c("D2","M1"),c("D3","M3"),c("D3","M4"),c("D3","M5"),c("D5","M6"),c("D4","M7"))
-  df1 <- df[!duplicated(df[c(4,6,7,8)]),]
-  df2 <- dcast(df1, Series_ID + Extract.End.Date ~ Measure,value.var="Value" )
-  for(j in 1:length(list_pairs)){
-    id_pairs <- list_pairs[[j]]
-    idx_NA <- which(df2[,id_pairs[1]]==0 & df2[,id_pairs[[2]]]>=0)
-    for(i in idx_NA) {
-      df2[,id_pairs[[2]]][i] <- NA
-    }
-  }
-  #Augment the wide df with factor variables to enable plotting of measures by SiteID
-  
-  #   df2_wide$SiteID <- as.factor(sapply(strsplit(as.character(df2_wide$Series_ID),split="_",fixed=TRUE),function(x) (x[1])))
-  #   df2_wide$Series.Name <- sapply(strsplit(as.character(df2_wide$Series_ID),split="_",fixed=TRUE),function(x) (x[2]))
-  #   df2_wide$Series.Name <- as.factor(sapply(df2_wide$Series.Name,replace_NA))
-  #   df2_wide$Measure_Type <- as.factor(substr(df2_wide$Measure,1,nchar(as.character(df2_wide$Measure))-1))
-  #   df2_wide$Measure_Name <- df2_wide$Measure
-  #   levels(df2_wide$Measure_Name) <- levels(as.factor(df_mnames$Measure_Name))
-  
-  #now melt the cast data frame to recreate the original long structure 
-  df3 <-  melt(df2,id.vars=c("Series_ID","Extract.End.Date"),variable.name="Measure", value.name="Value")
-  #recreate the SiteID and Series.Name variables
-  df3$SiteID <- as.factor(sapply(strsplit(as.character(df3$Series_ID),split="_",fixed=TRUE),function(x) (x[1])))
-  
-  df3$Series.Name <- sapply(strsplit(as.character(df3$Series_ID),split="_",fixed=TRUE),function(x) (x[2]))
-  df3$Series.Name <- as.factor(sapply(df3$Series.Name,replace_NA))
-  df3$Measure_Type <- as.factor(substr(df3$Measure,1,nchar(as.character(df3$Measure))-1))
-  df3$Measure_Name <- df3$Measure
-  levels(df3$Measure_Name) <- levels(as.factor(df_mnames$Measure_Name))
-  
-  #now reorder columns to mimic the original series
-  df3_long <- df3[,c("SiteID","Series.Name","Series_ID","Extract.End.Date","Measure",
-                     "Measure_Name","Measure_Type","Value")]
-  #   list_df <- list(df2_wide,df3_long)
-  return(df3_long)
+#function to append a measure type column to the melted data frame
+measure_type_maker <- function(df){
+  meastype <- c(rep("M",nrow(df)))
+  meastype[grep("OPM1", df$Measure)] <- "OPM"
+  meastype[grep("OPM2", df$Measure)] <- "OPM"
+  meastype[grep("OPM3", df$Measure)] <- "OPM"
+  meastype[grep("OPM4", df$Measure)] <- "OPM"
+  meastype[grep("_N",df$Measure)] <- "N"
+  meastype[grep("_D",df$Measure)] <- "D"
+  meastype[grep("Goal",df$Measure)] <- "Goal"
+  meastype[grep("Goal_OPM",df$Measure)] <- "Goal_OPM"
+  return(meastype)
 }
 
 
-#function to plot measures for a given team, which will be assembled into a display with grid.arrange
-#     
-#     take main data frame and subset by Series_ID and type of measure (D, M, N); for a stack of plots, the 
-#     x_axis_lab is a logical variable where FALSE indicates suppression of the x axis label for each plan
-p_by_team <- function(df,Site_ID,Series_name,meas_type,x_axis_lab){
-  
-  dfA <- droplevels(df[df$SiteID==Site_ID & 
-                         df$Series.Name==Series_name &
-                         df$Measure_Type==meas_type,])
-  
-  df_goals <- droplevels(df_mnames[df_mnames$measure_type==meas_type,])
-  
-  #convert M measures to percent, define the labels, and create the goals
-  if(meas_type=="M"){
-    dfA$Value <- 100*dfA$Value
-    y_axis_lab <- "Per cent"
-  } else {
-    y_axis_lab <- "Count" 
-  }
-  
-  #create medians
-  med_A <- as.vector(tapply(dfA$Value,dfA$Measure_Name,median,na.rm=TRUE))
-  Measure_Name <- levels(dfA$Measure_Name)
-  df.hlines <- data.frame(Measure_Name,med_A)
-  
-  #create goals
-  #   ygoal <- rep(y_goal,length(levels(dfB$SiteID)))
-  #   SiteID <- levels(dfB$SiteID)
-  #   df.goals_hlines <- data.frame(SiteID,ygoal)
-  
-  #can vary the axis labels by measure type
-  p1 <- ggplot(dfA,aes(x=Extract.End.Date,y=Value)) +
-    theme_bw() +
-    facet_wrap(~Measure_Name,nrow=2)+
-    geom_point(size=2.5)+
-    geom_line() +
-    ylab(y_axis_lab)+
-    xlab("Date") +
-    theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
-  
-  if(!x_axis_lab){
-    p1 <- p1+ theme(axis.title.x=element_blank())
-  }
-  
-  p11 <- p1 + geom_hline(aes(yintercept=med_A),data=df.hlines,lty=2)
-  #   if(!is.na(y_goal)){
-  p12 <- p11 + geom_hline(aes(yintercept=Goal), data=df_goals, lty=1,colour="green")
-  #   } else {
-  #     p12 <- p11
-  #   }
-  return(p12)
-}    
 
-# teams by measure....issue may be the number of team series?  allow value of nrows in facet plot to be variable
+# function to plot teams by measure....issue may be the number of team series?  allow value of nrows in facet plot to be variable
 # to generalize.  Make it an input on the user interface for more general use.
 #df is melted df, y-goal will need to be extracted from the file, p_nrow is the number of rows in the facet plot 
 p_by_measure <- function(df,MName,p_nrow){
@@ -297,4 +168,82 @@ p_by_measure <- function(df,MName,p_nrow){
                                 Series median dashed line."))
   } 
   return(p31)
- }
+  }
+
+
+
+
+
+#function to create a data table with ratio values greater than 1 or duplicated records for output and download
+df_prblm_records <- function(df) {
+  #records with ratio values greater than 1
+  value_idx <- as.integer(row.names(df[df$Measure=="M" & df$value > 100,]))
+  df1x <- df[value_idx,]
+  df1x$issue <- rep("ratio error",times=nrow(df1x))
+  #records that are truly duplicated
+  #http://stackoverflow.com/questions/11369961/subset-with-unique-cases-based-on-multiple-columns 
+  df2x <- df[duplicated(df[c(4,6,7,8)]) | duplicated(df[c(4,6,7,8)], fromLast=TRUE),]
+  df2x$issue <- rep("site_time_measure duplication",times=nrow(df2x))
+  df_all <- rbind.data.frame(df1x,df2x)
+  return(df_all)
+}
+
+
+
+#function to plot measures for a given team, which will be assembled into a display with grid.arrange
+#     
+#     take main data frame and subset by type of measure (D, M, N); for a stack of plots, the 
+#     x_axis_lab is a logical variable where FALSE indicates suppression of the x axis label for each plan
+p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
+  
+  dfA <- droplevels(df[df$ClinicName==Clinic_Name & 
+                         df$MeasType==meas_type,])
+  
+  #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
+  if(dfA$MeasType[1]=="M" | dfA$Measure[1]=="OPM1"){
+    y_axis_lab <- "per cent"
+    y_goal_label <- paste0("Goal_",dfA$Measure[1])
+    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(dfA$MeasType[1]=="N" | dfA$MeasType[1]=="D"){
+    y_axis_lab <- "Count"
+  } else if(MeasName=="OPM2") {
+    y_axis_lab <- "$/Hr"
+    y_goal_label <- paste0("Goal_",dfA$Measure[1])
+    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(MeasName=="OPM3") {
+    y_axis_lab <- "Encounters/Hr"
+    y_goal_label <- paste0("Goal_",dfA$Measure[1])
+    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+  } else if(MeasName=="OPM4") {
+    y_axis_lab <- "$/Visit"
+    y_goal_label <- paste0("Goal_",dfA$Measure[1])
+    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+  }
+  
+  #create medians
+  med_A <- as.vector(tapply(dfA$value,dfA$Measure,median,na.rm=TRUE))
+  Measure <- levels(dfA$Measure)
+  df.hlines <- data.frame(Measure,med_A)
+  
+  
+  #can vary the axis labels by measure type
+  p1 <- ggplot(dfA,aes(x=MeasMonth,y=value)) +
+    theme_bw() +
+    facet_wrap(~Measure,nrow=2)+
+    geom_point(size=2.5)+
+    geom_line() +
+    ylab(y_axis_lab)+
+    xlab("Date") +
+    theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
+  
+  if(!x_axis_lab){
+    p1 <- p1+ theme(axis.title.x=element_blank())
+  }
+  
+  p11 <- p1 + geom_hline(aes(yintercept=med_A),data=df.hlines,lty=2)
+  #   if(!is.na(y_goal)){
+  p12 <- p11 + geom_line(aes(x=MeasMonth,y=goal), lty=1,colour="green")
+  
+  return(p12)
+}    
+
