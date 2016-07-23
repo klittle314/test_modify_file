@@ -93,7 +93,7 @@ shinyServer(function(input, output, session) {
                     modalId = 'gs_data_exchange_modal',
                     toggle = 'close')               
                  })  
-  })
+ # })
   
   measure_choice <- reactive({
     data <- values$df_data
