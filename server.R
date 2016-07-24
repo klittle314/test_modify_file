@@ -28,7 +28,7 @@ shinyServer(function(input, output, session) {
                      
                      idx_start <- match(clinic_name,df_master1$ClinicName)
                      nrec_clinic <- length(df_master1$ClinicName[df_master1$ClinicName==clinic_name])
-                     idx_end <- idx_start + nrec_clinic
+                     idx_end <- idx_start + nrec_clinic-1  #
                      
                      #get the index of records for clinic in df_clinic
                      nrec_clinic_new <- nrow(df_clinic)
@@ -42,7 +42,7 @@ shinyServer(function(input, output, session) {
                      #define the cell in the first row of the clinic's records in df_master1 and the google sheet
                      anchor1 <- paste0("A",as.character(idx_start))
                      
-                     if(isTRUE(all.equal(nrec_clinic,nrec_clinic_new))) {
+                     if(isTRUE(base::all.equal(nrec_clinic,nrec_clinic_new))) {
                        #since the new record set has same number of rows as old record set, simply replace old with new df
                        gs_edit_cells(ss=gsobj,ws="Summary_Data",input=df_clinic,col_names=FALSE,anchor=anchor1)
                      } else if(nrec_clinic > nrec_clinic_new) {
