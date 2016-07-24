@@ -1,5 +1,4 @@
 
-
   shinyUI(fluidPage(
     titlePanel("NNOHA Collaborative Data Page"),
     
@@ -23,6 +22,11 @@
       #actionButton("Update2", "Update display")
       ),
     mainPanel(
+      bsModal(
+        id = 'gs_data_exchange_modal',
+        title = 'Exchanging Data with Google Drive',
+        h4('This communication may take 60 seconds, please wait for screen to refresh.'),
+        trigger = 'file1'),
       tabsetPanel(type="tabs",
                   
         tabPanel("table",dataTableOutput("df_data_out")),

@@ -1,24 +1,18 @@
 
 source("global.R")
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   values <- reactiveValues(df_data = df_melt)
-  
-  # df_to_update <- eventReactive(input$Update1,{
-  #   withProgress(message ='Exchanging Data with Google Drive', 
-  #                detail='This communication may take 60 seconds, please wait for screen to refresh.', value=0
-  
+
   observeEvent(input$file1, {
-    withProgress(message ='Exchanging Data with Google Drive', 
-                 detail='This communication may take 60 seconds, please wait for screen to refresh.', value=1, {
+                    df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
+                    
+                    #clean clinic data to our standards
+                    df_clinic <- clean_up_df1(df_clinic)
+                    names(df_clinic) <- names(df_master1)
+                    
                    clinic_name <- input$choose_clinic
-                   #retrieve new clinic data 
-                   df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
-                   
-                   #clean clinic data to our standards
-                   df_clinic <- clean_up_df1(df_clinic)
-                   names(df_clinic) <- names(df_master1)
-                   
+
                    #two cases:  the googlesheet already has data from the clinic or we just add the clinic data to end of sheet
                    #to speed processing, we need to set up the master data sheet in Google with dummy values for each clinic
                    #and we need to have the format locked down of the spreadsheets so we are in the simplest case of just
@@ -34,7 +28,7 @@ shinyServer(function(input, output) {
                      
                      idx_start <- match(clinic_name,df_master1$ClinicName)
                      nrec_clinic <- length(df_master1$ClinicName[df_master1$ClinicName==clinic_name])
-                     idx_end <- idx_start + nrec_clinic
+                     idx_end <- idx_start + nrec_clinic-1  #
                      
                      #get the index of records for clinic in df_clinic
                      nrec_clinic_new <- nrow(df_clinic)
@@ -48,7 +42,7 @@ shinyServer(function(input, output) {
                      #define the cell in the first row of the clinic's records in df_master1 and the google sheet
                      anchor1 <- paste0("A",as.character(idx_start))
                      
-                     if(isTRUE(all.equal(nrec_clinic,nrec_clinic_new))) {
+                     if(isTRUE(base::all.equal(nrec_clinic,nrec_clinic_new))) {
                        #since the new record set has same number of rows as old record set, simply replace old with new df
                        gs_edit_cells(ss=gsobj,ws="Summary_Data",input=df_clinic,col_names=FALSE,anchor=anchor1)
                      } else if(nrec_clinic > nrec_clinic_new) {
@@ -89,11 +83,17 @@ shinyServer(function(input, output) {
                    df_new1$ClinicName <- as.factor(df_new1$ClinicName)
                    #append measure type column
                    df_new1$MeasType <- measure_type_maker((df_new1))
+
                    #order the clinics by PM1_D values, largest to smallest
                    df_new1 <- reorder_df(df_new1)
-                   values$df_data <- df_new1               
+                   values$df_data <- df_new1   
+
+                   toggleModal(
+                    session = session,
+                    modalId = 'gs_data_exchange_modal',
+                    toggle = 'close')               
                  })  
-  })
+ # })
   
   measure_choice <- reactive({
     data <- values$df_data
