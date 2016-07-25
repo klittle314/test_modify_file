@@ -67,7 +67,8 @@ clean_up_df1 <- function(df) {
   #put any per cents greater than 100 as NA
   df2[,c(seq(6,30,3),42)] <- sapply(df2[,c(seq(6,30,3),42)],check_percents)
   #remove all rows with all cells NA for the measure columns 4 to 42
-  df2 <- remove_NA_rows(df2,c(4:42))
+  #commented out 25 July 2016 to match use of blocks of 36 rows per clinic
+  #df2 <- remove_NA_rows(df2,c(4:42))
   return(df2)
 }
 
