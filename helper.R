@@ -8,9 +8,11 @@ read_table_asis = function(...) {
 }
 
 
-#substitute Excel expression #N/A with actual NA
+#substitute Excel expression #N/A with actual NA; substitute NA string with actual NA
+#Google sheet written from a dataframe with NA entries will show NA string in cell.
 make_NA <- function(x) {
   x <- gsub("#N/A",NA,x)
+  x <- gsub("NA", NA, x)
 }
 
 #remove $ and extraneous characters from a vector that is supposed to be numeric, possibly including decimal
