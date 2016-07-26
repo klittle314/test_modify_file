@@ -26,7 +26,7 @@ shinyServer(function(input, output, session) {
                      #delete clinic records from the master file
                      df_all_but_clinic <- df_master1[df_master1$ClinicName!=clinic_name,]
                      #need to add 1 to index because the first row of the googlesheet is a header row, not data
-                     idx_start_old <- match(clinic_name,df_master1$ClinicName)+1
+                     idx_start_old <- match(clinic_name,df_master1$ClinicName)
                      nrec_clinic_old <- length(df_master1$ClinicName[df_master1$ClinicName==clinic_name])
                      idx_end_old <- idx_start_old + nrec_clinic_old-1  #
                      
@@ -40,7 +40,7 @@ shinyServer(function(input, output, session) {
                      
                      gsobj <- gs_key(x=gskey2)
                      #define the cell in the first row of the clinic's records in df_master1 and the google sheet
-                     anchor1 <- paste0("A",as.character(idx_start_old))
+                     anchor1 <- paste0("A",as.character(idx_start_old+1))
                      
                      if(isTRUE(base::all.equal(nrec_clinic_old,nrec_clinic_new))) {
                        #since the new record set has same number of rows as old record set, simply replace old with new df
