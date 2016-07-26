@@ -90,7 +90,7 @@ reorder_df <- function(df) {
   df3 <- df[,c("Measure","ClinicName","value")]
   df3A <- droplevels(df3[df3$Measure=="PM1_D",])
   #now get a function of the PM1_D values by Clinic, here we use medians.
-  pt_count <- unlist(by(df3A$value,df3A$ClinicName,FUN=median_or_NA, na.rm=TRUE,simplify=FALSE))
+  pt_count <- unlist(by(df3A$value,df3A$ClinicName,FUN=median_or_NA,simplify=FALSE))
   #now create a dataframe with the Clinic levels, the vector of medians, and an integer sequence
   df4 <- data.frame(levels(df3A$ClinicName),pt_count,c(1:length(pt_count)))
   names(df4) <- c("ClinicName","med_pt_count","orig_order")
