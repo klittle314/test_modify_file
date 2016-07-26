@@ -21,7 +21,8 @@ library(zoo)
 library(shinyBS)
 source("helper.R")
 
-clinic_list <- c("C1"="C1", "C2"= "C2", "C3"="C3", "C4"="C4","C5"="C5")
+clinic_table <- read.xlsx("Applications and selections  07-12-16 KL.xlsx", sheet="Final Selections")
+clinic_names <- clinic_table$Clinic.Name
 #test change in folder
 #test 2nd change in folder
 #test 3rd change in folder
