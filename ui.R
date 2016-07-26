@@ -4,11 +4,11 @@
     
     sidebarLayout(
       sidebarPanel(
-        selectInput("choose_clinic", label = h3("Select clinic"), 
-                    choices = clinic_list, 
-                    selected = 1),
-        
-        br(),
+        # selectInput("choose_clinic", label = h3("Select clinic"), 
+        #             choices = clinic_list, 
+        #             selected = 1),
+        # 
+        # br(),
         
         fileInput('file1', 'Upload Clinic Data Template',
                   accept=c('.xlsx','.xls')), 
