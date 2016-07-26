@@ -2,8 +2,10 @@
 source("global.R")
 
 shinyServer(function(input, output, session) {
-  values <- reactiveValues(df_data = df_melt)
-
+  values <- reactiveValues()
+  values$df_data = df_melt
+  values$clinic_name = as.character(df_melt$ClinicName[1])
+  
   observeEvent(input$file1, {
                     df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
                     
@@ -11,7 +13,8 @@ shinyServer(function(input, output, session) {
                     df_clinic <- clean_up_df1(df_clinic)
                     names(df_clinic) <- names(df_master1)
                     
-                   clinic_name <- input$choose_clinic
+                   #clinic_name <- input$choose_clinic
+                    clinic_name <- df_clinic$ClinicName[1]
 
                    #two cases:  the googlesheet already has data from the clinic or we just add the clinic data to end of sheet
                    #to speed processing, we need to set up the master data sheet in Google with dummy values for each clinic
@@ -86,7 +89,10 @@ shinyServer(function(input, output, session) {
 
                    #order the clinics by PM1_D values, largest to smallest
                    df_new1 <- reorder_df(df_new1)
-                   values$df_data <- df_new1   
+                   values$df_data <- df_new1  
+                   
+                   #update the clinic name
+                   values$clinic_name <- clinic_name
 
                    toggleModal(
                     session = session,
@@ -111,11 +117,13 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  
+  #26 July 2016 revise this function to put the clinic team just uploaded as the first entry in drop down
   team_choice <- reactive({
     data <- values$df_data
     if(!is.null(data)) {
       levs <- sort(as.character(levels(as.factor(data$ClinicName))))
+      levs1 <- levs[levs != values$clinic_name]
+      levs <- c(values$clinic_name,levs1)
       return(levs)
     }
   })
