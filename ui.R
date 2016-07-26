@@ -25,7 +25,7 @@
       bsModal(
         id = 'gs_data_exchange_modal',
         title = 'Exchanging Data with Google Drive',
-        h4('This communication may take 60 seconds, please wait for screen to refresh.'),
+        h4('This communication may take up to 60 seconds, please wait for screen to refresh.'),
         trigger = 'file1'),
       tabsetPanel(type="tabs",
                   
