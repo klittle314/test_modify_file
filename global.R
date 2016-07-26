@@ -1,3 +1,6 @@
+#shiny app allows users to load data from an Excel template to update a master Google sheet
+# Kevin Little, Ph.D.  Informing Ecological Design, LLC  June-August 2016
+
 library(Rcpp)
 library(ggplot2)
 library(scales)
@@ -37,7 +40,7 @@ gsobj <- gs_key(x=gskey2)
 
 df_master1 <- as.data.frame(gs_read(ss=gsobj,ws="Summary_Data"))
 #assumes the Summary Data has already been cleaned--starts in a clean state.
-#df_master1 <- clean_up_df1(df_master1)
+df_master1 <- clean_up_df1(df_master1)
 #sort df_master1 to have clinics in alpha order (contiguous records), and date ordered within clinic
 #in case data have been appended in earlier sessions
 #25 July 2016:  do not change the ordering of the values in the master data table
