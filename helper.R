@@ -8,9 +8,11 @@ read_table_asis = function(...) {
 }
 
 
-#substitute Excel expression #N/A with actual NA
+#substitute Excel expression #N/A with actual NA; substitute NA string with actual NA
+#Google sheet written from a dataframe with NA entries will show NA string in cell.
 make_NA <- function(x) {
   x <- gsub("#N/A",NA,x)
+  x <- gsub("NA", NA, x)
 }
 
 #remove $ and extraneous characters from a vector that is supposed to be numeric, possibly including decimal
@@ -67,10 +69,19 @@ clean_up_df1 <- function(df) {
   #put any per cents greater than 100 as NA
   df2[,c(seq(6,30,3),42)] <- sapply(df2[,c(seq(6,30,3),42)],check_percents)
   #remove all rows with all cells NA for the measure columns 4 to 42
-  df2 <- remove_NA_rows(df2,c(4:42))
+  #commented out 25 July 2016 to match use of blocks of 36 rows per clinic
+  #df2 <- remove_NA_rows(df2,c(4:42))
   return(df2)
 }
 
+#function to handle missing patient counts in ordering the clinic factor by size of median patient counts.
+
+median_or_NA <- function(x) {
+  if(all(is.na(x))){
+    x1 <- NA
+  } else x1 <- median(x,na.rm=TRUE)
+  return(x1)
+}
 
 #function to reorder ClinicName factor using the median patient count in month (0-20 yrs) for plotting facets in population order
 reorder_df <- function(df) {
@@ -79,7 +90,7 @@ reorder_df <- function(df) {
   df3 <- df[,c("Measure","ClinicName","value")]
   df3A <- droplevels(df3[df3$Measure=="PM1_D",])
   #now get a function of the PM1_D values by Clinic, here we use medians.
-  pt_count <- unlist(by(df3A$value,df3A$ClinicName,FUN=median, na.rm=TRUE,simplify=FALSE))
+  pt_count <- unlist(by(df3A$value,df3A$ClinicName,FUN=median_or_NA,simplify=FALSE))
   #now create a dataframe with the Clinic levels, the vector of medians, and an integer sequence
   df4 <- data.frame(levels(df3A$ClinicName),pt_count,c(1:length(pt_count)))
   names(df4) <- c("ClinicName","med_pt_count","orig_order")

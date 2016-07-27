@@ -4,11 +4,11 @@
     
     sidebarLayout(
       sidebarPanel(
-        selectInput("choose_clinic", label = h3("Select clinic"), 
-                    choices = clinic_list, 
-                    selected = 1),
-        
-        br(),
+        # selectInput("choose_clinic", label = h3("Select clinic"), 
+        #             choices = clinic_list, 
+        #             selected = 1),
+        # 
+        # br(),
         
         fileInput('file1', 'Upload Clinic Data Template',
                   accept=c('.xlsx','.xls')), 
@@ -25,7 +25,7 @@
       bsModal(
         id = 'gs_data_exchange_modal',
         title = 'Exchanging Data with Google Drive',
-        h4('This communication may take 60 seconds, please wait for screen to refresh.'),
+        h4('This communication may take up to 60 seconds, please wait for screen to refresh.'),
         trigger = 'file1'),
       tabsetPanel(type="tabs",
                   
