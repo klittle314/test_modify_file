@@ -8,14 +8,16 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$file1, {
                     df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
-                    
+                  
                     #clean clinic data to our standards
                     df_clinic <- clean_up_df1(df_clinic)
                     names(df_clinic) <- names(df_master1)
                     
                    #clinic_name <- input$choose_clinic
-                    clinic_name <- df_clinic$ClinicName[1]
+                    clinic_name <- as.character(df_clinic$ClinicName[1])
+                   
 
+                    
                    #two cases:  the googlesheet already has data from the clinic or we just add the clinic data to end of sheet
                    #to speed processing, we need to set up the master data sheet in Google with dummy values for each clinic
                    #and we need to have the format locked down of the spreadsheets so we are in the simplest case of just
