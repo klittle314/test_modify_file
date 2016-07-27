@@ -15,9 +15,15 @@ source("helper.R")
 #gskey2 <- c("1m6oVBbHRKb3UuDyImH1Tvl2nUXkQTwLi3Le2kwsciC4")
 gskey2 <- c("1tOYZfT6ZGRw06UabraijdgXtPu_J4a6oifvlWwRfsXg")
 gsobj <- gs_key(x=gskey2)
+<<<<<<< HEAD
 df_master <- gs_read(ss=gsobj,ws=4,range="A4:BC40")
 
 df_master1 <- clean_up_df1(df_master)
+=======
+df_master <- gs_read(ss=gsobj,ws=4,range="A4:BC112")
+df_master1 <- df_master
+#df_master1 <- clean_up_df1(df_master)
+>>>>>>> kl_test
 #write google sheet with reformatted data
 #first delete existing sheet
 list_sheets <- gs_ws_ls(ss=gsobj)
