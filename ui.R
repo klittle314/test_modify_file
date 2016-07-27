@@ -11,7 +11,9 @@
         # br(),
         
         fileInput('file1', 'Upload Clinic Data Template',
-                  accept=c('.xlsx','.xls')), 
+                  accept=c('.xlsx','.xls')),
+        
+        textOutput("excel_confirmation"),
       
         #drop down to select the Measure
         htmlOutput("selectMeasures"),
