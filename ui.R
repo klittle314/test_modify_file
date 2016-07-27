@@ -14,6 +14,8 @@
                   accept=c('.xlsx','.xls')),
         
         textOutput("excel_confirmation"),
+        
+        actionButton("update1", "update the data table"),
       
         #drop down to select the Measure
         htmlOutput("selectMeasures"),
