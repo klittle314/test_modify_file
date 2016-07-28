@@ -22,7 +22,14 @@ shinyServer(function(input, output, session) {
                     }
       })               
                     
- 
+
+excel_message <- reactive({
+  excel_message1 <- excel_confirmation()      
+  if(identical(excel_message1,"Spreadsheet passes basic checks.")){
+    excel_message1 <- " "
+  } 
+  return(excel_message1)
+})
                     
 output$excel_confirmation <- renderText(excel_confirmation())
 
@@ -45,9 +52,9 @@ df_clinic <- reactive({
 })
   
 excel_ok <- reactive({
-  check1 <- "FALSE"
+  check1 <- "Contact klittle@iecodesign.com for help."
   if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")) {
-    check1 <-"TRUE"
+    check1 <-"Click the update button to refresh data tables and displays."
   } 
   return(check1)
 })
