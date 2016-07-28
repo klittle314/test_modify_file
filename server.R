@@ -6,6 +6,7 @@ shinyServer(function(input, output, session) {
   values$df_data = df_melt
   values$clinic_name = as.character(df_melt$ClinicName[1])
   
+  #check the excel file for conformance to our structure
   excel_confirmation <- eventReactive(input$file1, {
                     df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
                     clinic_name <- df_clinic$ClinicName[1]
@@ -23,8 +24,9 @@ shinyServer(function(input, output, session) {
                     
  
                     
-output$excel_confirmation <- renderText(excel_confirmation())                   
-                  
+output$excel_confirmation <- renderText(excel_confirmation())
+
+                 
 
 df_clinic <- reactive({
       if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")){
@@ -42,7 +44,17 @@ df_clinic <- reactive({
   }
 })
   
+excel_ok <- reactive({
+  check1 <- "FALSE"
+  if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")) {
+    check1 <-"TRUE"
+  } 
+  return(check1)
+})
 
+output$check <- reactive({
+  excel_ok()
+})
 
 
 #get the index of records (start position and count) for clinic in df_master1 to use to revise the google sheet
