@@ -1,5 +1,9 @@
 
-  shinyUI(fluidPage(
+#references for conditional view of update action button are 
+#http://shiny.rstudio.com/articles/dynamic-ui.html and http://shiny.rstudio.com/articles/dynamic-ui.html
+
+
+ shinyUI(fluidPage(
     titlePanel("NNOHA Collaborative Data Page"),
     
     sidebarLayout(
@@ -19,8 +23,8 @@
         
         verbatimTextOutput("check"),
         
-        conditionalPanel(condition= "output.check == 'TRUE'",
-          actionButton("update1", "update the data table")
+        conditionalPanel(condition= "output.check == 'Click the update button to refresh data tables and displays.'",
+          actionButton("update1", "Update")
         ),
         
         br(),
