@@ -15,8 +15,15 @@
         
         textOutput("excel_confirmation"),
         
-        actionButton("update1", "update the data table"),
-      
+        br(),
+        
+        verbatimTextOutput("check"),
+        
+        conditionalPanel(condition= "output.check == 'TRUE'",
+          actionButton("update1", "update the data table")
+        ),
+        
+        br(),
         #drop down to select the Measure
         htmlOutput("selectMeasures"),
         
