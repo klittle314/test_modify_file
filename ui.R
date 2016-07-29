@@ -20,12 +20,14 @@
         textOutput("excel_confirmation"),
         
         br(),
+        #conditional UI
+        uiOutput("uploadbutton"),
         
-        verbatimTextOutput("check"),
-        
-        conditionalPanel(condition= "output.check == 'Click the update button to refresh data tables and displays.'",
-          actionButton("update1", "Update")
-        ),
+        # verbatimTextOutput("check"),
+        # 
+        # conditionalPanel(condition= "output.check == 'Click the update button to refresh data tables and displays.'",
+        #   actionButton("update1", "Update")
+        # ),
         
         br(),
         #drop down to select the Measure
@@ -39,8 +41,8 @@
         shiny::hr(),
         em(
           span("Created by "),
-          a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-          span(", 13 January 2016"),
+          a("Kevin Little, Ph.D. NNOHA Improvement Advisor", href = "mailto:klittle@iecodesign.com"),
+          span(", 28 July 2016"),
           br(), br()
         )
       #actionButton("Update1", "Update the data file"),
