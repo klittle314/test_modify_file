@@ -5,7 +5,7 @@
 
  shinyUI(fluidPage(
     titlePanel("NNOHA Collaborative Data Page"),
-    
+    img(src='logo.png', align = "top"),
     sidebarLayout(
       sidebarPanel(
         # selectInput("choose_clinic", label = h3("Select clinic"), 
@@ -32,7 +32,17 @@
         htmlOutput("selectMeasures"),
         
         #drop down to select the Team
-        htmlOutput("selectTeam")
+        htmlOutput("selectTeam"),
+        br(),
+        br(),
+        # author info
+        shiny::hr(),
+        em(
+          span("Created by "),
+          a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
+          span(", 13 January 2016"),
+          br(), br()
+        )
       #actionButton("Update1", "Update the data file"),
       #actionButton("Update2", "Update display")
       ),
