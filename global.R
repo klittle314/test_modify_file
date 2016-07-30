@@ -21,13 +21,12 @@ library(zoo)
 library(shinyBS)
 source("helper.R")
 
-clinic_table <- read.xlsx("Applications and selections  07-12-16 KL.xlsx", sheet="Final Selections")
+#will need to have the org file in the directory when converting to shinyapps.io
+path1 <- paste0("C:/Users/Kevin/Documents/NNOHA_2016_Dental_Collab/team Excel files/Applications and selections  07-29-16.xlsx")
+clinic_table <- read.xlsx(path1, sheet="update 28 July 2016")
+clinic_table <- clinic_table[1:20,]
 clinic_names <- clinic_table$Clinic.Name
-#test change in folder
-#test 2nd change in folder
-#test 3rd change in folder
-#test 4th change in folder
-#test 5th change in folder
+
 #load the googlesheet
 #gskey2 <- c("1dN9rj--OEghw7DdOO0f0y1dcObm2GQwvpbEPWcvAZUU")
 #gskey2 <- c("1m6oVBbHRKb3UuDyImH1Tvl2nUXkQTwLi3Le2kwsciC4")
