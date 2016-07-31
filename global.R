@@ -22,7 +22,7 @@ library(shinyBS)
 source("helper.R")
 
 #will need to have the org file in the directory when converting to shinyapps.io
-path1 <- paste0("C:/Users/Kevin/Documents/NNOHA_2016_Dental_Collab/team Excel files/Applications and selections  07-29-16.xlsx")
+path1 <- "Applications and selections  07-29-16.xlsx"
 clinic_table <- read.xlsx(path1, sheet="update 28 July 2016")
 clinic_table <- clinic_table[1:20,]
 clinic_names <- clinic_table$Clinic.Name
@@ -30,7 +30,8 @@ clinic_names <- clinic_table$Clinic.Name
 #load the googlesheet
 #gskey2 <- c("1dN9rj--OEghw7DdOO0f0y1dcObm2GQwvpbEPWcvAZUU")
 #gskey2 <- c("1m6oVBbHRKb3UuDyImH1Tvl2nUXkQTwLi3Le2kwsciC4")
-gskey2 <- c("1tOYZfT6ZGRw06UabraijdgXtPu_J4a6oifvlWwRfsXg")
+#gskey2 <- c("1tOYZfT6ZGRw06UabraijdgXtPu_J4a6oifvlWwRfsXg")
+gskey2 <- c("12XUHTunbyWQDG7eXusKPk3zJBAsjIBcj4ipCq_h4wHA")
 gsobj <- gs_key(x=gskey2)
 
 
