@@ -6,7 +6,7 @@ shinyServer(function(input, output, session) {
   values$df_data = df_melt
   values$clinic_name = as.character(df_melt$ClinicName[1])
   
-  #check the excel file for conformance to our structure
+  #check the excel file for conformance to our structure 31 July 2016:  can add detail to the checks.
   excel_confirmation <- eventReactive(input$file1, {
                     df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
                     clinic_name <- df_clinic$ClinicName[1]
@@ -75,6 +75,10 @@ output$uploadbutton <- renderUI({
 
 #get the index of records (start position and count) for clinic in df_master1 to use to revise the google sheet
 observeEvent(input$Update1,{                 
+                    toggleModal(
+                            session = session,
+                            modalId = 'gs_data_exchange_modal',
+                            toggle = 'close')  
                      df_clinicA <- df_clinic()
                      clinic_name <- df_clinicA$ClinicName[1]
                      #delete clinic records from the master file
@@ -122,10 +126,7 @@ observeEvent(input$Update1,{
                    #update the clinic name
                    values$clinic_name <- clinic_name
 
-                   toggleModal(
-                    session = session,
-                    modalId = 'gs_data_exchange_modal',
-                    toggle = 'close')               
+                                  
                  })  
 
   
