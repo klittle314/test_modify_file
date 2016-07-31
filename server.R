@@ -67,14 +67,14 @@ df_clinic <- reactive({
 output$uploadbutton <- renderUI({
   excel_message1 <- excel_confirmation()      
   if(identical(excel_message1,"Spreadsheet passes basic checks.")) {
-    actionButton("Upload", label = "upload", class = NULL)
+    actionButton("Update1", label = "update master file", class = NULL)
   } else NULL
   
 })
 
 
 #get the index of records (start position and count) for clinic in df_master1 to use to revise the google sheet
-observeEvent(input$update1,{                 
+observeEvent(input$Update1,{                 
                      df_clinicA <- df_clinic()
                      clinic_name <- df_clinicA$ClinicName[1]
                      #delete clinic records from the master file

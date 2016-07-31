@@ -53,7 +53,7 @@
         id = 'gs_data_exchange_modal',
         title = 'Exchanging Data with Google Drive',
         h4('This communication may take up to 60 seconds, please wait for screen to refresh.'),
-        trigger = 'update1'),
+        trigger = 'Update1'),
       tabsetPanel(type="tabs",
                   
         tabPanel("table",dataTableOutput("df_data_out")),
