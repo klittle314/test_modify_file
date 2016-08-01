@@ -67,7 +67,13 @@ df_clinic <- reactive({
 output$uploadbutton <- renderUI({
   excel_message1 <- excel_confirmation()      
   if(identical(excel_message1,"Spreadsheet passes basic checks.")) {
-    actionButton("Update1", label = "update master file", class = NULL)
+    tagList(
+      HTML("Click the Update! button to merge clinic data with the Google Sheet master data file."),
+      HTML("The update may take up to 60 seconds, please wait for confirmation message."),
+      br(),
+      br(),
+      actionButton("Update1", label = "Update!", class = NULL)
+    )
   } else NULL
   
 })
