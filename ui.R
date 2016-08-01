@@ -4,8 +4,8 @@
 
 
  shinyUI(fluidPage(
-    titlePanel("NNOHA Collaborative Data Web Application"),
-    img(src='logo.png', align = "top"),
+   img(src='logo.png', align = "top"),
+   titlePanel("NNOHA Collaborative Data Web Application"),
     sidebarLayout(
       sidebarPanel(
         # selectInput("choose_clinic", label = h3("Select clinic"), 
@@ -14,7 +14,7 @@
         # 
         # br(),
         
-        fileInput('file1', 'Upload Clinic Data Template',
+        fileInput('file1', 'Upload Clinic Excel Data File',
                   accept=c('.xlsx','.xls')),
         
         textOutput("excel_confirmation"),
@@ -51,8 +51,8 @@
     mainPanel(
       bsModal(
         id = 'gs_data_exchange_modal',
-        title = 'Data Exchange with Google Drive',
-        h4('Data successfully updated.  Close this window to continue.'),
+        title = 'Data exchange with Google Drive Successful.',
+        h4('Close this window to continue.'),
         trigger = 'Update1'),
       tabsetPanel(type="tabs",
                   
