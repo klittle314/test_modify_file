@@ -4,7 +4,7 @@
 
 
  shinyUI(fluidPage(
-    titlePanel("NNOHA Collaborative Data Page"),
+    titlePanel("NNOHA Collaborative Data Web Application"),
     img(src='logo.png', align = "top"),
     sidebarLayout(
       sidebarPanel(
@@ -51,7 +51,7 @@
     mainPanel(
       bsModal(
         id = 'gs_data_exchange_modal',
-        title = 'Exchanging Data with Google Drive',
+        title = 'Data Exchange with Google Drive',
         h4('Data successfully updated.  Close this window to continue.'),
         trigger = 'Update1'),
       tabsetPanel(type="tabs",
