@@ -62,4 +62,4 @@ df_melt <- goal_melt_df(df_melt)
 
 #read clinic names and short names, append short_names to df_melt
 df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet="short_names", rows=c(1:21))
-df_melt$Short_Names <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+df_melt$ShortName <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
