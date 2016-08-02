@@ -160,7 +160,7 @@ observeEvent(input$Update1,{
   team_choice <- reactive({
     data <- values$df_data
     if(!is.null(data)) {
-      levs <- sort(as.character(levels(as.factor(data$ClinicName))))
+      levs <- sort(as.character(levels(as.factor(data$ShortName))))
       levs1 <- levs[levs != values$clinic_name]
       levs <- c(values$clinic_name,levs1)
       return(levs)
