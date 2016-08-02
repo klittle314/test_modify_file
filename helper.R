@@ -83,7 +83,7 @@ median_or_NA <- function(x) {
   return(x1)
 }
 
-#function to reorder ShortName factor using the median patient count in month (0-20 yrs) for plotting facets in population order
+#function to reorder ClinicName factor using the median patient count in month (0-20 yrs) for plotting facets in population order
 reorder_df <- function(df) {
   
   #order the levels of clinics by volume:  There may be a simpler way to do this than by brute force
