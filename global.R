@@ -36,18 +36,12 @@ clinic_names <- clinic_table$Clinic.Name
 gskey2 <- c("12XUHTunbyWQDG7eXusKPk3zJBAsjIBcj4ipCq_h4wHA")
 gsobj <- gs_key(x=gskey2)
 
-
-
 #retrieve google sheet data, force as data.frame else the object is a tbl that seems to confuse other
 #functions expecting a dataframe
 
 df_master1 <- as.data.frame(gs_read(ss=gsobj,ws="Summary_Data"))
 #assumes the Summary Data has already been cleaned--starts in a clean state.
 df_master1 <- clean_up_df1(df_master1)
-#sort df_master1 to have clinics in alpha order (contiguous records), and date ordered within clinic
-#in case data have been appended in earlier sessions
-#25 July 2016:  do not change the ordering of the values in the master data table
-#df_master1 <- df_master1[order(df_master1$ClinicName,df_master1$RepMonth),] 
 
 #now melt the df for manipulation, omitting the Reporting Month, column 2 and setting up for plotting
 df_melt <- melt(df_master1[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
@@ -62,4 +56,8 @@ df_melt <- goal_melt_df(df_melt)
 
 #read clinic names and short names, append short_names to df_melt
 df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet="short_names", rows=c(1:21))
+
+#now trim trailing white spaces
+df_clinic_names$Short.Name <- trim.trailing(df_clinic_names$Short.Name)
+
 df_melt$ShortName <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
