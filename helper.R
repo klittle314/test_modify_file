@@ -83,22 +83,22 @@ median_or_NA <- function(x) {
   return(x1)
 }
 
-#function to reorder ClinicName factor using the median patient count in month (0-20 yrs) for plotting facets in population order
+#function to reorder ShortName factor using the median patient count in month (0-20 yrs) for plotting facets in population order
 reorder_df <- function(df) {
   
   #order the levels of clinics by volume:  There may be a simpler way to do this than by brute force
-  df3 <- df[,c("Measure","ClinicName","value")]
+  df3 <- df[,c("Measure","ShortName","value")]
   df3A <- droplevels(df3[df3$Measure=="PM1_D",])
   #now get a function of the PM1_D values by Clinic, here we use medians.
-  pt_count <- unlist(by(df3A$value,df3A$ClinicName,FUN=median_or_NA,simplify=FALSE))
+  pt_count <- unlist(by(df3A$value,df3A$ShortName,FUN=median_or_NA,simplify=FALSE))
   #now create a dataframe with the Clinic levels, the vector of medians, and an integer sequence
-  df4 <- data.frame(levels(df3A$ClinicName),pt_count,c(1:length(pt_count)))
-  names(df4) <- c("ClinicName","med_pt_count","orig_order")
+  df4 <- data.frame(levels(df3A$ShortName),pt_count,c(1:length(pt_count)))
+  names(df4) <- c("ShortName","med_pt_count","orig_order")
   #reorder the dataframe by descending order of the medians
   df4 <- df4[order(-df4[,2]),]
-  #now reorder the levels of the ClinicName factor in the df2 dataframe, using the descending median order index from
+  #now reorder the levels of the ShortName factor in the df2 dataframe, using the descending median order index from
   #dataframe df4
-  df$ClinicName <- factor(df$ClinicName,levels(df$ClinicName)[df4$orig_order])
+  df$ShortName <- factor(df$ShortName,levels(df$ShortName)[df4$orig_order])
   #     df$Measure_Name <- df$Measure
   #     levels(df$Measure_Name) <- levels(as.factor(df_mnames$Measure_Name))
   return(df)
@@ -119,7 +119,23 @@ measure_type_maker <- function(df){
   return(meastype)
 }
 
-
+#function to restructure the melted data set with goals as a separate column, given preliminary melted data set
+#input df must have five columns:  ClinicName, MeasMonth, Measure (factor), value, MeasType, Goal, ShortName
+goal_melt_df <- function(df1) {
+  measures_groupA <- c("OM1","PM1","PM2","PM3","PM4","PM5","PM6", "PM7", "PM8")
+  goals_groupA <- paste0("Goal_",measures_groupA)
+  measures_groupB <- c("OPM1","OPM2","OPM3","OPM4")
+  goals_groupB <- paste0("Goal_",measures_groupB)
+  dfA <- df1[df1$MeasType=='N',]
+  dfA$Goal <- NA
+  dfB <- df1[df1$MeasType=='D',]
+  dfB$Goal <- NA
+  dfC <- df1[df1$Measure %in% measures_groupA,]
+  dfC$Goal <- df1$value[df1$Measure %in% goals_groupA] 
+  dfD <- df1[df1$Measure %in% measures_groupB,]
+  dfD$Goal <- df1$value[df1$Measure %in% goals_groupB] 
+  df_out<- rbind.data.frame(dfA,dfB,dfC,dfD)
+} 
 
 # function to plot teams by measure....issue may be the number of team series?  allow value of nrows in facet plot to be variable
 # to generalize.  Make it an input on the user interface for more general use.
@@ -132,33 +148,33 @@ p_by_measure <- function(df,MName,p_nrow){
   if(dfB$MeasType[1]=="M" | dfB$Measure[1]=="OPM1"){
     y_axis_lab <- "per cent"
     y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+    #dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(dfB$MeasType[1]=="N" | dfB$MeasType[1]=="D"){
     y_axis_lab <- "Count"
   } else if(MeasName=="OPM2") {
     y_axis_lab <- "$/Hr"
     y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+    #dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(MeasName=="OPM3") {
     y_axis_lab <- "Encounters/Hr"
     y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+    #dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(MeasName=="OPM4") {
     y_axis_lab <- "$/Visit"
     y_goal_label <- paste0("Goal_",dfB$Measure[1])
-    dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
+    #dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
   }
   
   #create medians
-  med_B <- as.vector(tapply(dfB$value,dfB$ClinicName,median,na.rm=TRUE))
-  ClinicName <- levels(dfB$ClinicName)
-  df.hlines <- data.frame(ClinicName,med_B)
+  med_B <- as.vector(tapply(dfB$value,dfB$ShortName,median,na.rm=TRUE))
+  ShortName <- levels(dfB$ShortName)
+  df.hlines <- data.frame(ShortName,med_B)
   
   
   #create facet plot
   p2 <- ggplot(dfB,aes(x=MeasMonth,y=value))+
     theme_bw()+
-    facet_wrap(~ClinicName,nrow=p_nrow)+
+    facet_wrap(~ShortName,nrow=p_nrow)+
     geom_point(size=2.5)+
     geom_line()+
     ylab(y_axis_lab)+
@@ -169,7 +185,7 @@ p_by_measure <- function(df,MName,p_nrow){
   
   p21 <- p2 + geom_hline(aes(yintercept=med_B),data=df.hlines,lty=2)
   if(dfB$MeasType[1]=="M"){
-    p31 <- p21 + geom_line(aes(x=MeasMonth,y=goal), 
+    p31 <- p21 + geom_line(aes(x=MeasMonth,y=Goal), 
                            lty=1,colour="green")+
       ggtitle(paste0(MName," by Clinic
                      Series median: dashed line; Goal: solid line."))
@@ -207,7 +223,7 @@ df_prblm_records <- function(df) {
 #     x_axis_lab is a logical variable where FALSE indicates suppression of the x axis label for each plan
 p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
   
-  dfA <- droplevels(df[df$ClinicName==Clinic_Name & 
+  dfA <- droplevels(df[df$ShortName==Clinic_Name & 
                          df$MeasType==meas_type,])
   
   #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
@@ -217,7 +233,7 @@ p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
     dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(dfA$MeasType[1]=="N" | dfA$MeasType[1]=="D"){
     y_axis_lab <- "Count"
-    dfA$goal <- NULL
+    y_goal_label <- NULL
   } else if(MeasName=="OPM2") {
     y_axis_lab <- "$/Hr"
     y_goal_label <- paste0("Goal_",dfA$Measure[1])
@@ -253,7 +269,7 @@ p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
   }
   
   p11 <- p1 + geom_hline(aes(yintercept=med_A),data=df.hlines,lty=2)
-     if(!is.null(y_goal)){
+     if(!is.null(y_goal_label)){
         p12 <- p11 + geom_line(data=dfA,aes(x=MeasMonth,y=goal), lty=1,colour="green")
      } else  {
         p12 <- p11
