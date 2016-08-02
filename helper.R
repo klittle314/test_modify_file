@@ -7,6 +7,8 @@ read_table_asis = function(...) {
   read_table(..., col_types = paste(rep("c", n_cols), collapse = ""))
 }
 
+# function returns string w/o trailing whitespace
+trim.trailing <- function (x) sub("\\s+$", "", x)
 
 #substitute Excel expression #N/A with actual NA; substitute NA string with actual NA
 #Google sheet written from a dataframe with NA entries will show NA string in cell.
@@ -230,22 +232,22 @@ p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
   if(dfA$MeasType[1]=="M" | dfA$Measure[1]=="OPM1"){
     y_axis_lab <- "per cent"
     y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+    # dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(dfA$MeasType[1]=="N" | dfA$MeasType[1]=="D"){
     y_axis_lab <- "Count"
     y_goal_label <- NULL
   } else if(MeasName=="OPM2") {
     y_axis_lab <- "$/Hr"
     y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+    # dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(MeasName=="OPM3") {
     y_axis_lab <- "Encounters/Hr"
     y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+    #dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(MeasName=="OPM4") {
     y_axis_lab <- "$/Visit"
     y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
+    #dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   }
   
   #create medians
