@@ -174,7 +174,7 @@ observeEvent(input$Update1,{
     measure <- input$choose_Meas
     data <-  values$df_data
     if(!is.null(data) && !is.null(measure)) {
-      p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=1)
+      p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=4)
       print(p_m2)
     }
   })
