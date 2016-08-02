@@ -60,8 +60,9 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
                   
                   tabPanel("Measure by Health Center",
                            plotOutput("measure_plot",height="800px")),
-                  tabPanel("Health Center Measures",
-                           plotOutput("")),
+                  #to uncomment when I have the function working
+                  tabPanel("Health Center Measures"),
+                           #plotOutput("")),
                   tabPanel("Data Table",dataTableOutput("df_data_out"))
       )
      )
