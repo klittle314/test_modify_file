@@ -10,8 +10,8 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
     wellPanel(
       tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
       helpText("Click on the Update/Display tab to:"),
-      helpText("(1) Upload data using the Excel file for your organization"),
-      helpText("(2) View measures by organization and organizations by measures"),
+      helpText("(1) Upload data using the Excel file for your health center"),
+      helpText("(2) View measures by health center and health centers by measures"),
                
       br(),
       helpText("Questions? Contact Kevin Little, Ph.D., NNOHA Collaborative Improvement Advisor"),
@@ -33,7 +33,7 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       sidebarPanel(
       
       
-      fileInput('file1', 'Upload Clinic Excel Data File',
+      fileInput('file1', "Upload Your Health Center's Excel Data File",
                 accept=c('.xlsx','.xls')),
       
       textOutput("excel_confirmation"),
@@ -46,7 +46,7 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       #drop down to select the Measure
       htmlOutput("selectMeasures"),
       
-      #drop down to select the Team
+      #drop down to select the Health Center
       htmlOutput("selectTeam"),
       br()
     ),
@@ -58,8 +58,10 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
         trigger = 'Update1'),
       tabsetPanel(type="tabs",
                   
-                  tabPanel("Measure by Team",
+                  tabPanel("Measure by Health Center",
                            plotOutput("measure_plot",height="800px")),
+                  tabPanel)"Health Center Measures",
+                           plotOutput("")
                   tabPanel("Data Table",dataTableOutput("df_data_out"))
       )
      )
