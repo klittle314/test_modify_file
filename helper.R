@@ -217,6 +217,7 @@ p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
     dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(dfA$MeasType[1]=="N" | dfA$MeasType[1]=="D"){
     y_axis_lab <- "Count"
+    dfA$goal <- NULL
   } else if(MeasName=="OPM2") {
     y_axis_lab <- "$/Hr"
     y_goal_label <- paste0("Goal_",dfA$Measure[1])
@@ -252,9 +253,11 @@ p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
   }
   
   p11 <- p1 + geom_hline(aes(yintercept=med_A),data=df.hlines,lty=2)
-  #   if(!is.na(y_goal)){
-  p12 <- p11 + geom_line(aes(x=MeasMonth,y=goal), lty=1,colour="green")
-  
+     if(!is.null(y_goal)){
+        p12 <- p11 + geom_line(data=dfA,aes(x=MeasMonth,y=goal), lty=1,colour="green")
+     } else  {
+        p12 <- p11
+     }
   return(p12)
 }    
 
