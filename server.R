@@ -148,7 +148,7 @@ observeEvent(input$Update1,{
   output$selectMeasures <- renderUI({
     measure_choice1 <- measure_choice()
     if(!is.null(measure_choice1)) {
-      selectInput("choose_Meas",label=h4("Choose measure"),choices=measure_choice1,width="100%")
+      selectInput("choose_Meas",label=h4("Choose measure to plot by health center"),choices=measure_choice1,width="100%")
     }
   })
   
@@ -166,7 +166,7 @@ observeEvent(input$Update1,{
   output$selectTeam <- renderUI({
     team_choice1 <- team_choice()
     if(!is.null(team_choice1)) {
-      selectInput("choose_Team",label=h4("Choose team"),choices=team_choice1,width="100%")
+      selectInput("choose_Team",label=h4("Choose health center"),choices=team_choice1,width="100%")
     }
   })  
   
@@ -179,5 +179,12 @@ observeEvent(input$Update1,{
     }
   })
   
+  output$team_plot <- renderPlot({
+    team <- input$choose_team
+    data <- values$df_data
+    if(!is.null(data) && !is.null(team)) {
+      p_t1 <- p_by_team(df=data,)
+    }
+  })
   output$df_data_out <- renderDataTable(values$df_data)
 })
