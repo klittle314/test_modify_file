@@ -53,5 +53,13 @@ df_master1 <- clean_up_df1(df_master1)
 df_melt <- melt(df_master1[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
 
 df_melt$ClinicName <- as.factor(df_melt$ClinicName)
-#append measure type 
+
+#append measure type  
 df_melt$MeasType <- measure_type_maker(df_melt)
+
+#strip off goals and associate goals with the measures
+df_melt <- goal_melt_df(df_melt)
+
+#read clinic names and short names, append short_names to df_melt
+df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet="short_names", rows=c(1:21))
+df_melt$Short_Names <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
