@@ -4,7 +4,7 @@ source("global.R")
 shinyServer(function(input, output, session) {
   values <- reactiveValues()
   values$df_data = df_melt
-  values$clinic_name = as.character(df_melt$ClinicName[1])
+  values$clinic_name = as.character(df_melt$ShortName[1])
   
   #check the excel file for conformance to our structure 31 July 2016:  can add detail to the checks.
   excel_confirmation <- eventReactive(input$file1, {
@@ -44,7 +44,7 @@ df_clinic <- reactive({
        names(df_clinicA) <- names(df_master1)
     
       #clinic_name <- input$choose_clinic
-       clinic_name <- as.character(df_clinicA$ClinicName[1])
+      #clinic_name <- as.character(df_clinicA$ClinicName[1])
         return(df_clinicA)
     } else {
       df_clinicA <- NULL
@@ -116,21 +116,25 @@ observeEvent(input$Update1,{
                      df_new <- df_master1
                      
                      
-                   
-                   
-                   
                    #now create a melted, reduced version of the data frame for manipulation (remove RepMonth variable)
                    df_new1 <- melt(df_new[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
                    df_new1$ClinicName <- as.factor(df_new1$ClinicName)
                    #append measure type column
-                   df_new1$MeasType <- measure_type_maker((df_new1))
+                   df_new1$MeasType <- measure_type_maker(df_new1)
+                   
+                   #append goals column
+                   df_new1 <- goal_melt_df(df_new1)
+                   
+                   #append shortnames column
+                   df_new1$ShortName <- mapvalues(df_new1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
 
                    #order the clinics by PM1_D values, largest to smallest
                    df_new1 <- reorder_df(df_new1)
                    values$df_data <- df_new1  
                    
-                   #update the clinic name
-                   values$clinic_name <- clinic_name
+                   #update the clinic name, using the short name
+                   values$clinic_name <- df_clinic_names$Short.Name[grep(clinic_name,df_clinic_names$Clinic.Name)]
+                  
 
                                   
                  })  
@@ -179,12 +183,12 @@ observeEvent(input$Update1,{
     }
   })
   
-  output$team_plot <- renderPlot({
-    team <- input$choose_team
-    data <- values$df_data
-    if(!is.null(data) && !is.null(team)) {
-      p_t1 <- p_by_team(df=data,)
-    }
-  })
+  # output$team_plot <- renderPlot({
+  #   team <- input$choose_team
+  #   data <- values$df_data
+  #   if(!is.null(data) && !is.null(team)) {
+  #     p_t1 <- p_by_team(df=data,)
+  #   }
+  # })
   output$df_data_out <- renderDataTable(values$df_data)
 })
