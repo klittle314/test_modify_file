@@ -223,31 +223,20 @@ df_prblm_records <- function(df) {
 #     
 #     take main data frame and subset by type of measure (D, M, N); for a stack of plots, the 
 #     x_axis_lab is a logical variable where FALSE indicates suppression of the x axis label for each plan
-p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
+#     we can plot the OM1 and PM measures together as type "M" because they are all % variables
+#     Need a separate function to handle the OPM measures, they have a variety of units and hence y axis labels.
+p_by_team1 <- function(df,Clinic_Name,meas_type,x_axis_lab,nrow_plot=2){
   
   dfA <- droplevels(df[df$ShortName==Clinic_Name & 
                          df$MeasType==meas_type,])
   
   #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
-  if(dfA$MeasType[1]=="M" | dfA$Measure[1]=="OPM1"){
+  if(dfA$Measure[1]=="M"){
     y_axis_lab <- "per cent"
     y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    # dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   } else if(dfA$MeasType[1]=="N" | dfA$MeasType[1]=="D"){
     y_axis_lab <- "Count"
     y_goal_label <- NULL
-  } else if(MeasName=="OPM2") {
-    y_axis_lab <- "$/Hr"
-    y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    # dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
-  } else if(MeasName=="OPM3") {
-    y_axis_lab <- "Encounters/Hr"
-    y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    #dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
-  } else if(MeasName=="OPM4") {
-    y_axis_lab <- "$/Visit"
-    y_goal_label <- paste0("Goal_",dfA$Measure[1])
-    #dfA$goal <- df$value[grep(y_goal_label,df$Measure)]
   }
   
   #create medians
@@ -259,7 +248,7 @@ p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
   #can vary the axis labels by measure type
   p1 <- ggplot(dfA,aes(x=MeasMonth,y=value)) +
     theme_bw() +
-    facet_wrap(~Measure,nrow=2)+
+    facet_wrap(~Measure,nrow=nrow_plot)+
     geom_point(size=2.5)+
     geom_line() +
     ylab(y_axis_lab)+
@@ -272,10 +261,49 @@ p_by_team <- function(df,Clinic_Name,meas_type,x_axis_lab){
   
   p11 <- p1 + geom_hline(aes(yintercept=med_A),data=df.hlines,lty=2)
      if(!is.null(y_goal_label)){
-        p12 <- p11 + geom_line(data=dfA,aes(x=MeasMonth,y=goal), lty=1,colour="green")
+        p12 <- p11 + geom_line(data=dfA,aes(x=MeasMonth,y=Goal), lty=1,colour="green")
      } else  {
         p12 <- p11
      }
   return(p12)
 }    
 
+#this function takes the individual measures and creates a graphical object that can then be gridded
+p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab) {
+  dfA <- droplevels(df[df$ShortName==Clinic_Name & 
+                         df$Measure==meas_name,])
+  y_axis_lab <- "per cent"
+  y_goal_label <- paste0("Goal_",meas_name)
+  if(meas_name=="OPM1"){
+    y_axis_lab <- "per cent"
+  } else if(meas_name=="OPM2") {
+    y_axis_lab <- "$/Hr"
+  } else if(meas_name=="OPM3") {
+    y_axis_lab <- "Encounters/Hr"
+  } else if(meas_name=="OPM4") {
+    y_axis_lab <- "$/Visit"
+  }
+  
+  p1 <- ggplot(dfA,aes(x=MeasMonth,y=value)) +
+    theme_bw() +
+    geom_point(size=2.5)+
+    geom_line() +
+    ylab(y_axis_lab)+
+    xlab("Date") +
+    ggtitle(paste0(meas_name)) 
+    #,  
+                   #Series median: dashed line; Goal: solid line."))
+   # theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
+  
+  if(!x_axis_lab){
+    p1 <- p1+ theme(axis.title.x=element_blank())
+   }
+  med_y <- median(dfA$value, na.rm=TRUE)
+  p11 <- p1 + geom_hline(aes(yintercept=med_y), lty=2)
+  if(!is.null(y_goal_label)){
+    p12 <- p11 + geom_line(data=dfA,aes(x=MeasMonth,y=Goal), lty=1,colour="green")
+  } else  {
+    p12 <- p11
+  }
+  return(p12) 
+}
