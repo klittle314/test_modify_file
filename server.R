@@ -183,12 +183,19 @@ observeEvent(input$Update1,{
     }
   })
   
-  # output$team_plot <- renderPlot({
-  #   team <- input$choose_team
-  #   data <- values$df_data
-  #   if(!is.null(data) && !is.null(team)) {
-  #     p_t1 <- p_by_team(df=data,)
-  #   }
-  # })
+  #https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html 
+  output$team_plot <- renderPlot({
+    #for testing only, make measure subset dynamic or at least by reference
+    meas_subset1 <- c("OM1","PM1","PM2","PM3")
+    team <- input$choose_Team
+    #team <- "Zufall"
+    data <- values$df_data
+    # if(!is.null(data) && !is.null(team)) {
+      
+      p_list <- lapply(meas_subset1,p_by_team2,df=data, Clinic_Name=team,x_axis_lab=TRUE)
+      p_out <- grid.arrange(grobs=p_list, ncol=2, top=team, bottom="Series median: dashed line; Goal: solid line.")
+      print(p_out)
+      # }
+  })
   output$df_data_out <- renderDataTable(values$df_data)
 })
