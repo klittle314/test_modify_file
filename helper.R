@@ -147,7 +147,7 @@ p_by_measure <- function(df,MName,p_nrow){
   dfB <- droplevels(df[df$Measure==MName,])
   
   #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
-  if(dfB$MeasType[1]=="M" | dfB$Measure[1]=="OPM1"){
+  if(dfB$MeasType[1]=="M" | dfB$Measure[1]=="OPM1" | dfB$Measure[1] == "OPM5"){
     y_axis_lab <- "per cent"
     y_goal_label <- paste0("Goal_",dfB$Measure[1])
     #dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
@@ -269,7 +269,7 @@ p_by_team1 <- function(df,Clinic_Name,meas_type,x_axis_lab,nrow_plot=2){
 }    
 
 #this function takes the individual measures and creates a graphical object that can then be gridded
-p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab) {
+p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625) {
   dfA <- droplevels(df[df$ShortName==Clinic_Name & 
                          df$Measure==meas_name,])
   y_axis_lab <- "per cent"
@@ -289,8 +289,10 @@ p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab) {
     geom_point(size=2.5)+
     geom_line() +
     ylab(y_axis_lab)+
-    xlab("Date") +
-    ggtitle(paste0(meas_name)) 
+    #xlab("Date") +
+    ggtitle(paste0(meas_name)) +
+    theme(aspect.ratio=asp_ratio)
+  
     #,  
                    #Series median: dashed line; Goal: solid line."))
    # theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
