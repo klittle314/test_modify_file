@@ -61,3 +61,6 @@ df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet=
 df_clinic_names$Short.Name <- trim.trailing(df_clinic_names$Short.Name)
 
 df_melt$ShortName <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+
+#subset of measures for individual clinic display
+meas_subset <- levels(df_melt$Measure)[1:12]
