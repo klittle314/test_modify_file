@@ -178,7 +178,7 @@ observeEvent(input$Update1,{
     measure <- input$choose_Meas
     data <-  values$df_data
     if(!is.null(data) && !is.null(measure)) {
-      p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=4)
+      p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=5)
       print(p_m2)
     }
   })
@@ -192,7 +192,7 @@ observeEvent(input$Update1,{
     data <- values$df_data
     # if(!is.null(data) && !is.null(team)) {
       
-      p_list <- lapply(meas_subset1,p_by_team2,df=data, Clinic_Name=team,x_axis_lab=TRUE)
+      p_list <- lapply(meas_subset1,p_by_team2,df=data, Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8)
       p_out <- grid.arrange(grobs=p_list, ncol=2, top=team, bottom="Series median: dashed line; Goal: solid line.")
       print(p_out)
       # }
