@@ -49,6 +49,8 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       #drop down to select the Health Center
       htmlOutput("selectTeam"),
       br()
+      
+
     ),
     mainPanel(
       bsModal(
@@ -59,10 +61,15 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       tabsetPanel(type="tabs",
                   
                   tabPanel("Measure by Health Center",
-                           plotOutput("measure_plot",height="800px")),
+                           plotOutput("measure_plot",height="750px")),
                   #to uncomment when I have the function working
                   tabPanel("Health Center Measures",
-                           plotOutput("team_plot", height="800px")),
+                           plotOutput("team_plot2", height="600px"),
+                           br(),
+                           h4("click to download image"),
+                           br(),
+                           downloadButton('downloadFile', 'Download')),
+                          
                   tabPanel("Data Table",dataTableOutput("df_data_out"))
       )
      )
