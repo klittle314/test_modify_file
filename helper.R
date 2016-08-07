@@ -59,7 +59,8 @@ remove_NA_rows <- function(df,cindex) {
 # assumes that the input file will always have 36 data rows and four headers.
 clean_up_df1 <- function(df) {
   df2 <- as.data.frame(lapply(df,make_NA), stringsAsFactors = FALSE)
-  names(df2) <- gsub("-","_",names(df2))
+  #why is - (dash) being rendered as "."?
+  names(df2) <- gsub("\\.","_",names(df2))
   df2[,4:ncol(df2)] <- sapply(df2[,4:ncol(df2)],clean_chars)
   #rename the goal columns
   RepMonth <- as.Date(as.yearmon("2016-02-01")+ 0:35/12)
@@ -114,6 +115,7 @@ measure_type_maker <- function(df){
   meastype[grep("OPM2", df$Measure)] <- "OPM"
   meastype[grep("OPM3", df$Measure)] <- "OPM"
   meastype[grep("OPM4", df$Measure)] <- "OPM"
+  meastype[grep("OPM5", df$Measure)] <- "OPM"
   meastype[grep("_N",df$Measure)] <- "N"
   meastype[grep("_D",df$Measure)] <- "D"
   meastype[grep("Goal",df$Measure)] <- "Goal"
@@ -124,9 +126,9 @@ measure_type_maker <- function(df){
 #function to restructure the melted data set with goals as a separate column, given preliminary melted data set
 #input df must have five columns:  ClinicName, MeasMonth, Measure (factor), value, MeasType, Goal, ShortName
 goal_melt_df <- function(df1) {
-  measures_groupA <- c("OM1","PM1","PM2","PM3","PM4","PM5","PM6", "PM7", "PM8")
+  measures_groupA <- c("OM1","PM1","PM2","PM3","PM4","PM5","PM6", "PM7")
   goals_groupA <- paste0("Goal_",measures_groupA)
-  measures_groupB <- c("OPM1","OPM2","OPM3","OPM4")
+  measures_groupB <- c("OPM1","OPM2","OPM3","OPM4","OPM5")
   goals_groupB <- paste0("Goal_",measures_groupB)
   dfA <- df1[df1$MeasType=='N',]
   dfA$Goal <- NA
@@ -286,10 +288,13 @@ p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625) {
   
   p1 <- ggplot(dfA,aes(x=MeasMonth,y=value)) +
     theme_bw() +
-    geom_point(size=2.5)+
+    geom_point(size=3.5)+
     geom_line() +
     ylab(y_axis_lab)+
-    #xlab("Date") +
+    theme(axis.title.y=element_text(size=rel(1.5)))+
+    theme(axis.text.y=element_text(size=rel(1.5)))+
+    theme(axis.text.x=element_text(size=rel(1.25)))+
+    xlab(" ") +
     ggtitle(paste0(meas_name)) +
     theme(aspect.ratio=asp_ratio)
   
