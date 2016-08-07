@@ -271,7 +271,8 @@ p_by_team1 <- function(df,Clinic_Name,meas_type,x_axis_lab,nrow_plot=2){
 }    
 
 #this function takes the individual measures and creates a graphical object that can then be gridded
-p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625) {
+#parameter trbl1 is a vector of plot.margin values (top, right, bottom, left) to pad space 
+p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625, trbl1=c(0,.5,0,.5)) {
   dfA <- droplevels(df[df$ShortName==Clinic_Name & 
                          df$Measure==meas_name,])
   y_axis_lab <- "per cent"
@@ -291,12 +292,14 @@ p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625) {
     geom_point(size=3.5)+
     geom_line() +
     ylab(y_axis_lab)+
-    theme(axis.title.y=element_text(size=rel(1.5)))+
-    theme(axis.text.y=element_text(size=rel(1.5)))+
+    theme(axis.title.y=element_text(size=rel(1.25)))+
+    theme(axis.text.y=element_text(size=rel(1.25)))+
     theme(axis.text.x=element_text(size=rel(1.25)))+
-    xlab(" ") +
-    ggtitle(paste0(meas_name)) +
-    theme(aspect.ratio=asp_ratio)
+    theme(plot.margin=unit(trbl1,"cm"))+
+    theme(aspect.ratio=asp_ratio)+
+    xlab(" ")+
+    ggtitle(paste0(meas_name))
+    
   
     #,  
                    #Series median: dashed line; Goal: solid line."))
