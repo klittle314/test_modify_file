@@ -33,7 +33,7 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       sidebarPanel(
       
       
-      fileInput('file1', "Upload Your Health Center's Excel Data File",
+      fileInput('file1', label=h4("Upload Your Health Center's Excel Data File"),
                 accept=c('.xlsx','.xls')),
       
       textOutput("excel_confirmation"),
@@ -55,14 +55,13 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
     mainPanel(
       bsModal(
         id = 'gs_data_exchange_modal',
-        title = 'Data exchange with Google Drive Successful.',
-        h4('Close this window to continue.'),
+        title = 'Data exchange with Google Drive successful.',
+        h4('Please close this window to continue.'),
         trigger = 'Update1'),
       tabsetPanel(type="tabs",
                   
                   tabPanel("Measure by Health Center",
                            plotOutput("measure_plot",height="750px")),
-                  #to uncomment when I have the function working
                   tabPanel("Health Center Measures",
                            plotOutput("team_plot2", height="600px"),
                            br(),
