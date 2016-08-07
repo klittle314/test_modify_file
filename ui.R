@@ -66,7 +66,7 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
                   tabPanel("Health Center Measures",
                            plotOutput("team_plot2", height="600px"),
                            br(),
-                           h4("click to download image"),
+                           h4("Click to download a .png picture of this display"),
                            br(),
                            downloadButton('downloadFile', 'Download')),
                           
