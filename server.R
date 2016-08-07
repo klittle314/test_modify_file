@@ -156,7 +156,7 @@ observeEvent(input$Update1,{
     }
   })
   
-  #26 July 2016 revise this function to put the clinic team just uploaded as the first entry in drop down
+  #26 July 2016 revised this function to put the clinic team just uploaded as the first entry in drop down
   team_choice <- reactive({
     data <- values$df_data
     if(!is.null(data)) {
@@ -183,19 +183,65 @@ observeEvent(input$Update1,{
     }
   })
   
-  #https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html 
-  output$team_plot <- renderPlot({
+  #https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html describes how to arrange grobs
+  # output$team_plot <- renderPlot({
+  #   #for testing only, make measure subset dynamic or at least by reference
+  #   meas_subset1 <- c("OM1","PM1","PM2","OPM1")
+  #   team <- input$choose_Team
+  #   data <- values$df_data
+  #   # if(!is.null(data) && !is.null(team)) {
+  #     
+  #     p_list<- lapply(meas_subset1,p_by_team2,df=data,Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8)
+  #     p_out <- grid.arrange(grobs=p_list, 
+  #                           ncol=2, 
+  #                           top=textGrob(team, gp=gpar(fontsize=20)),
+  #                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=20)))
+  #     print(p_out)
+  #     # }
+  # })
+  
+  team_plot <- reactive({
     #for testing only, make measure subset dynamic or at least by reference
-    meas_subset1 <- c("OM1","PM1","PM2","PM3")
+    meas_subset1 <- c("OM1","PM1","PM2","OPM1")
     team <- input$choose_Team
-    #team <- "Zufall"
     data <- values$df_data
     # if(!is.null(data) && !is.null(team)) {
-      
-      p_list <- lapply(meas_subset1,p_by_team2,df=data, Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8)
-      p_out <- grid.arrange(grobs=p_list, ncol=2, top=team, bottom="Series median: dashed line; Goal: solid line.")
-      print(p_out)
-      # }
+    
+    p_list<- lapply(meas_subset1,p_by_team2,df=data,Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8)
+    p_out <- grid.arrange(grobs=p_list, 
+                          ncol=2, 
+                          top=textGrob(team, gp=gpar(fontsize=20)),
+                          bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=20)))
   })
-  output$df_data_out <- renderDataTable(values$df_data)
+  
+  #idea from https://groups.google.com/forum/#!msg/shiny-discuss/u7gwXc8_vyY/IZK_o7b7I8gJ
+  team_plot0 <- function(){
+    meas_subset1 <- c("OM1","PM1","PM2","OPM1")
+    team <- input$choose_Team
+    data <- values$df_data
+    # if(!is.null(data) && !is.null(team)) {
+    
+    p_list<- lapply(meas_subset1,p_by_team2,df=data,Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8)
+    p_out <- grid.arrange(grobs=p_list, 
+                          ncol=2, 
+                          top=textGrob(team, gp=gpar(fontsize=20)),
+                          bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=20)))
+  }
+  
+  output$team_plot2 <- renderPlot({
+    print(team_plot())
+  })
+  
+  output$downloadFile <- downloadHandler(
+    filename = function() { 
+      paste('test', '.png', sep='') 
+    },
+    content = function(file) {
+      png(file)
+      print(team_plot0())
+      dev.off()
+    }
+  )
+  
+  output$df_data_out <- renderDataTable(values$df_data[,c(1,2,3,4,6)])
 })
