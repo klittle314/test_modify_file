@@ -51,17 +51,7 @@ df_clinic <- reactive({
   }
 })
   
-# excel_ok <- reactive({
-#   check1 <- "Contact klittle@iecodesign.com for help."
-#   if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")) {
-#     check1 <-"Click the update button to refresh data tables and displays."
-#   } 
-#   return(check1)
-# })
 
-# output$check <- reactive({
-#   excel_ok()
-# })
 
 #conditional show of the upload button, show only if excel check is OK
 output$uploadbutton <- renderUI({
@@ -69,7 +59,9 @@ output$uploadbutton <- renderUI({
   if(identical(excel_message1,"Spreadsheet passes basic checks.")) {
     tagList(
       HTML("Click the Update! button to merge clinic data with the Google Sheet master data file."),
-      HTML("The update may take up to 60 seconds, please wait for confirmation message."),
+      br(),
+      br(),
+      HTML("The update may take up to 60 seconds, please wait for confirmation message in pop up window."),
       br(),
       br(),
       actionButton("Update1", label = "Update!", class = NULL)
@@ -184,21 +176,7 @@ observeEvent(input$Update1,{
   })
   
   #https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html describes how to arrange grobs
-  # output$team_plot <- renderPlot({
-  #   #for testing only, make measure subset dynamic or at least by reference
-  #   meas_subset1 <- c("OM1","PM1","PM2","OPM1")
-  #   team <- input$choose_Team
-  #   data <- values$df_data
-  #   # if(!is.null(data) && !is.null(team)) {
-  #     
-  #     p_list<- lapply(meas_subset1,p_by_team2,df=data,Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8)
-  #     p_out <- grid.arrange(grobs=p_list, 
-  #                           ncol=2, 
-  #                           top=textGrob(team, gp=gpar(fontsize=20)),
-  #                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=20)))
-  #     print(p_out)
-  #     # }
-  # })
+ 
   
   team_plot <- reactive({
     #for testing only, make measure subset dynamic or at least by reference
@@ -213,8 +191,8 @@ observeEvent(input$Update1,{
                           top=textGrob(team, gp=gpar(fontsize=20)),
                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=20)))
   })
-  
-  #idea from https://groups.google.com/forum/#!msg/shiny-discuss/u7gwXc8_vyY/IZK_o7b7I8gJ
+   
+  #idea from https://groups.google.com/forum/#!msg/shiny-discuss/u7gwXc8_vyY/IZK_o7b7I8gJ tp create non-reactive fcn
   team_plot0 <- function(){
     #need to revise subset of measures during 2016-17 as we add reporting requirement
     meas_subset1 <- c("OM1","PM1","PM2","OPM1")
@@ -235,7 +213,7 @@ observeEvent(input$Update1,{
   
   output$downloadFile <- downloadHandler(
     filename = function() { 
-      paste(input$choose_Team, '.png', sep='') 
+      paste0(input$choose_Team, "_", Sys.Date(),'.png') 
     },
     content = function(file) {
       png(file)
