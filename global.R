@@ -32,8 +32,9 @@ clinic_names <- clinic_table$Clinic.Name
 #gskey2 <- c("1m6oVBbHRKb3UuDyImH1Tvl2nUXkQTwLi3Le2kwsciC4")
 #working sheet July 2016
 #gskey2 <- c("1tOYZfT6ZGRw06UabraijdgXtPu_J4a6oifvlWwRfsXg")
-#master sheet with 20 clinics
-gskey2 <- c("12XUHTunbyWQDG7eXusKPk3zJBAsjIBcj4ipCq_h4wHA")
+#master sheet with 20 clinics updated 5 Aug 2016
+#gskey2 <- c("12XUHTunbyWQDG7eXusKPk3zJBAsjIBcj4ipCq_h4wHA")
+gskey2 <- c("1ia4R53Q1P8EGy5Yg4CKq0iCFk9CNOSV1Z73jhZ677IA")
 gsobj <- gs_key(x=gskey2)
 
 #retrieve google sheet data, force as data.frame else the object is a tbl that seems to confuse other
@@ -63,4 +64,4 @@ df_clinic_names$Short.Name <- trim.trailing(df_clinic_names$Short.Name)
 df_melt$ShortName <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
 
 #subset of measures for individual clinic display
-meas_subset <- levels(df_melt$Measure)[1:12]
+# meas_subset <- levels(df_melt$Measure)[1:12]
