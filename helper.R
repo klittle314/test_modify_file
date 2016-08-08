@@ -202,9 +202,6 @@ p_by_measure <- function(df,MName,p_nrow){
   }
 
 
-
-
-
 #function to create a data table with ratio values greater than 1 or duplicated records for output and download
 df_prblm_records <- function(df) {
   #records with ratio values greater than 1
@@ -277,9 +274,7 @@ p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625, trbl
                          df$Measure==meas_name,])
   y_axis_lab <- "per cent"
   y_goal_label <- paste0("Goal_",meas_name)
-  if(meas_name=="OPM1"){
-    y_axis_lab <- "per cent"
-  } else if(meas_name=="OPM2") {
+  if(meas_name=="OPM2") {
     y_axis_lab <- "$/Hr"
   } else if(meas_name=="OPM3") {
     y_axis_lab <- "Encounters/Hr"
@@ -299,12 +294,7 @@ p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625, trbl
     theme(aspect.ratio=asp_ratio)+
     xlab(" ")+
     ggtitle(paste0(meas_name))
-    
-  
-    #,  
-                   #Series median: dashed line; Goal: solid line."))
-   # theme(axis.text.x=element_text(angle=30,hjust=1,vjust=1))
-  
+ 
   if(!x_axis_lab){
     p1 <- p1+ theme(axis.title.x=element_blank())
    }
