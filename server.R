@@ -4,6 +4,7 @@ source("global.R")
 shinyServer(function(input, output, session) {
   values <- reactiveValues()
   values$df_data = df_melt
+  values$df_data1 = df_melt_goals
   values$clinic_name = as.character(df_melt$ShortName[1])
   
   #check the excel file for conformance to our structure 31 July 2016:  can add detail to the checks.
@@ -113,17 +114,20 @@ observeEvent(input$Update1,{
                    df_new1$ClinicName <- as.factor(df_new1$ClinicName)
                    #append measure type column
                    df_new1$MeasType <- measure_type_maker(df_new1)
+                   #make a copy of df_new1 with the goals in the original position
+                   df_new2 <- df_new1
                    
                    #append goals column
                    df_new1 <- goal_melt_df(df_new1)
                    
                    #append shortnames column
                    df_new1$ShortName <- mapvalues(df_new1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
-
+                   df_new2$ShortName <- mapvalues(df_new2$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
                    #order the clinics by PM1_D values, largest to smallest
                    df_new1 <- reorder_df(df_new1)
+                   df_new2 <- reorder_df(df_new2)
                    values$df_data <- df_new1  
-                   
+                   values$df_data1 <- df_new2
                    #update the clinic name, using the short name
                    values$clinic_name <- df_clinic_names$Short.Name[grep(clinic_name,df_clinic_names$Clinic.Name)]
                   
@@ -144,7 +148,7 @@ observeEvent(input$Update1,{
   output$selectMeasures <- renderUI({
     measure_choice1 <- measure_choice()
     if(!is.null(measure_choice1)) {
-      selectInput("choose_Meas",label=h4("Choose measure to plot by health center"),choices=measure_choice1,width="100%")
+      selectInput("choose_Meas",label=h4("Choose measure to plot by Health Center"),choices=measure_choice1,width="100%")
     }
   })
   
@@ -162,7 +166,7 @@ observeEvent(input$Update1,{
   output$selectTeam <- renderUI({
     team_choice1 <- team_choice()
     if(!is.null(team_choice1)) {
-      selectInput("choose_Team",label=h4("Choose health center"),choices=team_choice1,width="100%")
+      selectInput("choose_Team",label=h4("Choose Health Center"),choices=team_choice1,width="100%")
     }
   })  
   
@@ -222,5 +226,11 @@ observeEvent(input$Update1,{
     }
   )
   
-  output$df_data_out <- renderDataTable(values$df_data[,c(1,2,3,4,6)])
+  output$clinic_name <- renderText(input$choose_Team)
+  
+  output$df_data_out <- renderDataTable({
+    team <- input$choose_Team
+    data <- values$df_data
+    df_out <- droplevels(data[data$ShortName==team,c(1,2,3,4,6)])
+  })
 })
