@@ -269,7 +269,7 @@ p_by_team1 <- function(df,Clinic_Name,meas_type,x_axis_lab,nrow_plot=2){
 
 #this function takes the individual measures and creates a graphical object that can then be gridded
 #parameter trbl1 is a vector of plot.margin values (top, right, bottom, left) to pad space 
-p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625, trbl1=c(0,.5,0,.5)) {
+p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625, trbl1=c(0,.05,0,.05)) {
   dfA <- droplevels(df[df$ShortName==Clinic_Name & 
                          df$Measure==meas_name,])
   y_axis_lab <- "per cent"
