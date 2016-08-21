@@ -69,7 +69,16 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
                            br(),
                            downloadButton('downloadFile', 'Download')),
                           
-                  tabPanel("Data Table",dataTableOutput("df_data_out"))
+                  tabPanel("Health Center Data Table",
+                           textOutput("clinic_name"),
+                           tags$head(tags$style("#clinic_name{color: red;
+                                 font-size: 20px;
+                                                font-style: italic;
+                                                }"
+                              )
+                            ),
+                           br(),
+                           dataTableOutput("df_data_out"))
       )
      )
     )
