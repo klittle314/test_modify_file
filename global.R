@@ -49,8 +49,12 @@ df_melt <- melt(df_master1[,-2],id.vars=c("ClinicName","MeasMonth"),variable.nam
 
 df_melt$ClinicName <- as.factor(df_melt$ClinicName)
 
+
 #append measure type  
 df_melt$MeasType <- measure_type_maker(df_melt)
+
+#make a copy of the df before stripping off the goals
+df_melt_goals <- df_melt
 
 #strip off goals and associate goals with the measures
 df_melt <- goal_melt_df(df_melt)
@@ -62,6 +66,6 @@ df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet=
 df_clinic_names$Short.Name <- trim.trailing(df_clinic_names$Short.Name)
 
 df_melt$ShortName <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
-
+df_melt1$ShortName <- mapvalues(df_melt1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
 #subset of measures for individual clinic display
 # meas_subset <- levels(df_melt$Measure)[1:12]
