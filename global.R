@@ -8,8 +8,8 @@ library(grid)
 library(gridExtra)
 library(gtable)
 library(GGally)
-library(dplyr)
-library(plyr)
+# library(plyr)
+# library(dplyr)
 library(reshape2)
 library(stats)
 library(tidyr)
@@ -69,3 +69,18 @@ df_melt$ShortName <- mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Na
 df_melt1$ShortName <- mapvalues(df_melt1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
 #subset of measures for individual clinic display
 # meas_subset <- levels(df_melt$Measure)[1:12]
+
+#create a factor vector with measure names to match wide format in ui Data Table: 1872 records
+MNames <- levels(df_melt1$Measure)[seq(3,39, by=3)]
+#str(MNames)
+#now create a vector of measure names
+MeasName1 <- as.data.frame(sapply(MNames,rep, 108,simplify=TRUE), stringsAsFactors=FALSE)
+MeasName1.1<- stack(MeasName1)
+MeasName1.2 <- MeasName1.1$values
+MeasName2 <- as.data.frame(sapply(MNames,rep, 36,simplify=TRUE), stringsAsFactors=FALSE)
+MeasName2.1<- stack(MeasName2)
+MeasName2.2 <- MeasName2.1$values
+MeasName <- c(MeasName1.2,MeasName2.2)
+MeasName <- factor(MeasName, levels=c("OM1","PM1","PM2","PM3",
+                                      "PM4","PM5","PM6","PM7","OPM1",
+                                      "OPM2","OPM3","OPM4","OPM5"))
