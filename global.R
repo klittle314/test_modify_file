@@ -54,7 +54,7 @@ df_melt$ClinicName <- as.factor(df_melt$ClinicName)
 df_melt$MeasType <- measure_type_maker(df_melt)
 
 #make a copy of the df before stripping off the goals
-df_melt_goals <- df_melt
+df_melt1 <- df_melt
 
 #strip off goals and associate goals with the measures
 df_melt <- goal_melt_df(df_melt)
