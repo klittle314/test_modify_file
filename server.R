@@ -4,7 +4,7 @@ source("global.R")
 shinyServer(function(input, output, session) {
   values <- reactiveValues()
   values$df_data = df_melt
-  values$df_data1 = df_melt_goals
+  values$df_data1 = df_melt1
   values$clinic_name = as.character(df_melt$ShortName[1])
   
   #check the excel file for conformance to our structure 31 July 2016:  can add detail to the checks.
