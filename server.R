@@ -230,7 +230,15 @@ observeEvent(input$Update1,{
   
   output$df_data_out <- renderDataTable({
     team <- input$choose_Team
-    data <- values$df_data
-    df_out <- droplevels(data[data$ShortName==team,c(1,2,3,4,6)])
+    data <- values$df_data1
+    df_out1 <- droplevels(data[data$ShortName==team,])
+    df_out1$MeasType <- as.factor(df_out1$MeasType)
+    df_out1$MeasType[df_out1$MeasType=="Goal_OPM"] <- "Goal"
+    df_out1$MeasType[df_out1$MeasType=="OPM"] <- "M"
+    df_out2 <- cbind.data.frame(df_out1,MeasName)
+    df_out3<- dcast(data=df_out2,MeasMonth + MeasName ~ MeasType)
+    df_out4 <- df_out3[order(df_out3$MeasName),c(1,2,6,3,5,4)]
+    names(df_out4) <- c("Meas. Month","Measure Name", "Numerator", "Denominator", "Measure", "Goal")
+    df_out4 <- df_out4[!is.na(df_out4$Numerator), ]
   })
 })
