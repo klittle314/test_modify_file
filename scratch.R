@@ -499,26 +499,47 @@ debugonce(mmplot)
 team <- "Choptank"
 df_out <- droplevels(df_melt1[df_melt1$ShortName==team,c(2:4,6)])
 df_out1 <- droplevels(df_melt1[df_melt1$ShortName==team,])
-
+df_out1$MeasType <- as.factor(df_out1$MeasType)
+df_out1$MeasType[df_out1$MeasType=="Goal_OPM"] <- "Goal"
+df_out1$MeasType[df_out1$MeasType=="OPM"] <- "M"
 #need to reorder the columns before melting so that all the measures are grouped.
 
 #recover the raw data
-test222 <- dcast(data=df_out,MeasMonth ~ Measure)
-test233 <- dcast(data=df_out, MeasMonth ~ Goal)
+#test222 <- dcast(data=df_out,MeasMonth ~ Measure)
+#test233 <- dcast(data=df_out, MeasMonth ~ Goal)
 
-test444 <- df_master1[,]
-
+#test444 <- df_master1[,]
+#Create a vector of Measure names corresponding to the stack of 1872 records:  one clinic by 13 measures x 4 elements x 36 months.
 MNames <- levels(df_melt1$Measure)[seq(3,39, by=3)]
-str(MNames)
-Mstar1 <- as.data.frame(sapply(MNames,function(x) rep(x,144),simplify=TRUE), stringsAsFactors=FALSE)
-Mstar2<- stack(Mstar1)
-Mstar3 <- Mstar2$values
+#str(MNames)
+#now create a vector of measure names
+MeasName1 <- as.data.frame(sapply(MNames,rep, 108,simplify=TRUE), stringsAsFactors=FALSE)
+MeasName1.1<- stack(MeasName1)
+MeasName1.2 <- MeasName1.1$values
+MeasName2 <- as.data.frame(sapply(MNames,rep, 36,simplify=TRUE), stringsAsFactors=FALSE)
+MeasName2.1<- stack(MeasName2)
+MeasName2.2 <- MeasName2.1$values
+MeasName <- c(MeasName1.2,MeasName2.2)
+MeasName <- factor(MeasName, levels=c("OM1","PM1","PM2","PM3",
+                                              "PM4","PM5","PM6","PM7","OPM1",
+                                              "OPM2","OPM3","OPM4","OPM5"))
+#Code the measure types
+#Mblock1 <- c(rep("N",36),rep("D",36),rep("R",36))
+#Mtype1 <- rep(Mblock1,13)
+#Mtype2 <- rep("Goal",13*36)
+#Mtype <- c(Mtype1,Mtype2)
+
+df_out2 <- cbind.data.frame(df_out1,MeasName)
+#Now order the levels of the Mstar3 variable
+#test444$Mstar3 <- factor(test444$Mstar3, levels=c("OM1","PM1","PM2","PM3",
+ #                                                 "PM4","PM5","PM6","PM7","OPM1",
+#                                                "OPM2","OPM3","OPM4","OPM5"))
+#now order the data frame by levels of Mstar3 variable
+
+df_out3<- dcast(data=df_out2,MeasMonth + MeasName ~ MeasType)
 
 
-Mblock <- c(rep("N",36),rep("D",36),rep("R",36),rep("Goal",36))
-Mtype <- rep(Mblock,13)
-
-test444 <- cbind.data.frame(df_out1,Mstar3,Mtype)
+df_out4 <- df_out3[order(df_out3$MeasName),c(1,2,6,3,5,4)]
 =======
 >>>>>>> kl_test
 >>>>>>> origin
