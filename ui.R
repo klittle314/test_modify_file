@@ -71,7 +71,8 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
                           
                   tabPanel("Health Center Data Table",
                            textOutput("clinic_name"),
-                           tags$head(tags$style("#clinic_name{color: red;
+                           h4("Records with numerator and denominator values"),
+                           tags$head(tags$style("#clinic_name{color: black;
                                  font-size: 20px;
                                                 font-style: italic;
                                                 }"
