@@ -9,14 +9,14 @@ shinyServer(function(input, output, session) {
   
   #check the excel file for conformance to our structure 31 July 2016:  can add detail to the checks.
   excel_confirmation <- eventReactive(input$file1, {
-                    df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
+                    df_clinic <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,cols=c(1:59),detectDates=TRUE)
                     clinic_name <- df_clinic$ClinicName[1]
                   
                     if(!(clinic_name %in% unique(df_master1$ClinicName))) {
                       out_message <- "Clinic name does not match our collaborative list."
                     } else if(nrow(df_clinic) != 36) {
                       out_message <- paste0("Data Table worksheet has ",nrow(df_clinic),"  rows; we require 36 data rows.")
-                    } else if(ncol(df_clinic) != 55) {
+                    } else if(ncol(df_clinic) != 59) {
                       out_message <- paste0("Data Table worksheet has ",ncol(df_clinic)," columns; we require 55 columns.")
                     } else {
                       out_message <- "Spreadsheet passes basic checks."
@@ -38,7 +38,7 @@ output$excel_confirmation <- renderText(excel_confirmation())
 
 df_clinic <- reactive({
       if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")){
-        df_clinicA <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,detectDates=TRUE)
+        df_clinicA <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,cols=c(1:59),detectDates=TRUE)
       #clean clinic data to our standards
     
        df_clinicA <- clean_up_df1(df_clinicA)
@@ -121,8 +121,8 @@ observeEvent(input$Update1,{
                    df_new1 <- goal_melt_df(df_new1)
                    
                    #append shortnames column
-                   df_new1$ShortName <- mapvalues(df_new1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
-                   df_new2$ShortName <- mapvalues(df_new2$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+                   df_new1$ShortName <- plyr::mapvalues(df_new1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+                   df_new2$ShortName <- plyr::mapvalues(df_new2$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
                    #order the clinics by PM1_D values, largest to smallest
                    df_new1 <- reorder_df(df_new1)
                    df_new2 <- reorder_df(df_new2)
@@ -170,14 +170,21 @@ observeEvent(input$Update1,{
     }
   })  
   
-  output$measure_plot <- renderPlot({
+  measure_plot <- reactive({
     measure <- input$choose_Meas
     data <-  values$df_data
     if(!is.null(data) && !is.null(measure)) {
       p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=5)
-      print(p_m2)
     }
   })
+  
+  measure_plot0 <- function(){
+    measure <- input$choose_Meas
+    data <-  values$df_data
+    if(!is.null(data) && !is.null(measure)) {
+      p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=5)
+    }
+  }
   
   #https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html describes how to arrange grobs
  
@@ -211,11 +218,26 @@ observeEvent(input$Update1,{
                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=14)))
   }
   
+  output$measure_plot2 <- renderPlot({
+    print(measure_plot())
+  })
+  
   output$team_plot2 <- renderPlot({
     print(team_plot())
   })
   
-  output$downloadFile <- downloadHandler(
+  output$downloadMPlot <- downloadHandler(
+    filename = function() { 
+      paste0(input$choose_Meas, "_", Sys.Date(),'.png') 
+    },
+    content = function(file) {
+      png(file)
+      print(measure_plot0())
+      dev.off()
+    }
+  )
+  
+  output$downloadHCPlot <- downloadHandler(
     filename = function() { 
       paste0(input$choose_Team, "_", Sys.Date(),'.png') 
     },
