@@ -61,20 +61,24 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       tabsetPanel(type="tabs",
                   
                   tabPanel("Measure by Health Center",
-                           plotOutput("measure_plot",height="750px")),
+                           plotOutput("measure_plot2",height="750px"),
+                           br(),
+                           h4("Click to download a .png picture of this display"),
+                           br(),
+                           downloadButton('downloadMPlot', 'Download')),
                   tabPanel("Health Center Measures",
                            plotOutput("team_plot2", height="600px"),
                            br(),
                            h4("Click to download a .png picture of this display"),
                            br(),
-                           downloadButton('downloadFile', 'Download')),
+                           downloadButton('downloadHCPlot', 'Download')),
                           
                   tabPanel("Health Center Data Table",
                            textOutput("clinic_name"),
                            h4("Records with numerator and denominator values"),
                            tags$head(tags$style("#clinic_name{color: black;
                                  font-size: 20px;
-                                                font-style: italic;
+                                                font-style: normal;
                                                 }"
                               )
                             ),
