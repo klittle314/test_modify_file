@@ -35,7 +35,7 @@ check_percents <- function(col1) {
   col_out <- sapply(col1,restrict_percents)
 }
 
-# functionto reorder factor by mean:  reverse order function:  may be useful for ordering levels for facet plots
+# function to reorder factor by mean:  reverse order function:  may be useful for ordering levels for facet plots
 reverse_order <- function(x){
   rev_order <- -1*mean(x)
 }
@@ -66,12 +66,12 @@ clean_up_df1 <- function(df) {
   RepMonth <- as.Date(as.yearmon("2016-02-01")+ 0:35/12)
   MeasMonth <- as.Date(as.yearmon("2016-01-01")+ 0:35/12)
   #define the names of the goal columns properly
-  names(df2)[43:55] <- c(paste0("Goal_",names(df2)[seq(6,42,3)]))
+  names(df2)[46:59] <- c(paste0("Goal_",names(df2)[seq(6,45,3)]))
   df2$RepMonth <- RepMonth
   df2$MeasMonth <- MeasMonth
   #put any per cents greater than 100 as NA
-  df2[,c(seq(6,30,3),42)] <- sapply(df2[,c(seq(6,30,3),42)],check_percents)
-  #remove all rows with all cells NA for the measure columns 4 to 42
+  df2[,c(seq(6,30,3),45)] <- sapply(df2[,c(seq(6,30,3),45)],check_percents)
+  #remove all rows with all cells NA for the measure columns 4 to 45
   #commented out 25 July 2016 to match use of blocks of 36 rows per clinic
   #df2 <- remove_NA_rows(df2,c(4:42))
   return(df2)
@@ -113,7 +113,8 @@ measure_type_maker <- function(df){
   meastype <- c(rep("M",nrow(df)))
   meastype[grep("OPM1", df$Measure)] <- "OPM"
   meastype[grep("OPM2", df$Measure)] <- "OPM"
-  meastype[grep("OPM3", df$Measure)] <- "OPM"
+  meastype[grep("OPM3_d", df$Measure)] <- "OPM"
+  meastype[grep("OPM3_h", df$Measure)] <- "OPM"
   meastype[grep("OPM4", df$Measure)] <- "OPM"
   meastype[grep("OPM5", df$Measure)] <- "OPM"
   meastype[grep("_N",df$Measure)] <- "N"
@@ -128,7 +129,7 @@ measure_type_maker <- function(df){
 goal_melt_df <- function(df1) {
   measures_groupA <- c("OM1","PM1","PM2","PM3","PM4","PM5","PM6", "PM7")
   goals_groupA <- paste0("Goal_",measures_groupA)
-  measures_groupB <- c("OPM1","OPM2","OPM3","OPM4","OPM5")
+  measures_groupB <- c("OPM1","OPM2","OPM3_d","OPM3_h","OPM4","OPM5")
   goals_groupB <- paste0("Goal_",measures_groupB)
   dfA <- df1[df1$MeasType=='N',]
   dfA$Goal <- NA
@@ -159,7 +160,7 @@ p_by_measure <- function(df,MName,p_nrow){
     y_axis_lab <- "$/Hr"
     y_goal_label <- paste0("Goal_",dfB$Measure[1])
     #dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
-  } else if(MeasName=="OPM3") {
+  } else if(MeasName=="OPM3_d" | MeasName=="OPM3_h") {
     y_axis_lab <- "Encounters/Hr"
     y_goal_label <- paste0("Goal_",dfB$Measure[1])
     #dfB$goal <- df$value[grep(y_goal_label,df$Measure)]
@@ -188,15 +189,14 @@ p_by_measure <- function(df,MName,p_nrow){
   
   
   p21 <- p2 + geom_hline(aes(yintercept=med_B),data=df.hlines,lty=2)
-  if(dfB$MeasType[1]=="M"){
+  if(dfB$MeasType[1]=="M" | dfB$MeasType[1]=="OPM"){
     p31 <- p21 + geom_line(aes(x=MeasMonth,y=Goal), 
                            lty=1,colour="green")+
       ggtitle(paste0(MName," by Clinic
                      Series median: dashed line; Goal: solid line."))
     
   } else {
-    p31 <- p21 + ggtitle(paste0(MName," by Clinic 
-                                Series median dashed line."))
+    p31 <- p21 + ggtitle(paste0(MName," by Clinic; Series median: dashed line."))
   } 
   return(p31)
   }
