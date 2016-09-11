@@ -71,10 +71,14 @@ df_clinic_names$Short.Name <- trim.trailing(df_clinic_names$Short.Name)
 
 df_melt$ShortName <- plyr::mapvalues(df_melt$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
 df_melt1$ShortName <- plyr::mapvalues(df_melt1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+
+df_melt$MeasName <- plyr::mapvalues(df_melt$Measure,from=measname_table$Code,measname_table$Abbreviation)
+df_melt1$MeasName <- plyr::mapvalues(df_melt1$Measure,from=measname_table$Code,measname_table$Abbreviation)
+
 #subset of measures for individual clinic display
 # meas_subset <- levels(df_melt$Measure)[1:12]
 
-#create a factor vector with measure names to match wide format in ui Data Table: 1872 records
+#create a factor vector with measure names to match wide format in ui Data Table: 2016 records
 MNames <- levels(df_melt1$Measure)[seq(3,42, by=3)]
 #str(MNames)
 #now create a vector of measure names
@@ -88,3 +92,5 @@ MeasName <- c(MeasName1.2,MeasName2.2)
 MeasName <- factor(MeasName, levels=c("OM1","PM1","PM2","PM3",
                                       "PM4","PM5","PM6","PM7","OPM1",
                                       "OPM2","OPM3_d","OPM3_h","OPM4","OPM5"))
+#Now change to MeasName with character string names
+MeasNameChar <- plyr::mapvalues(MeasName,from=measname_table$Code,measname_table$Abbreviation)
