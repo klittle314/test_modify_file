@@ -1,5 +1,5 @@
 #shiny app allows users to load data from an Excel template to update a master Google sheet
-# Kevin Little, Ph.D.  Informing Ecological Design, LLC  June-August 2016
+# Kevin Little, Ph.D.  Informing Ecological Design, LLC  June-Sept 2016
 
 library(Rcpp)
 library(ggplot2)
@@ -24,8 +24,11 @@ source("helper.R")
 #will need to have the org file in the directory when converting to shinyapps.io
 path1 <- "Applications and selections  07-29-16.xlsx"
 clinic_table <- read.xlsx(path1, sheet="update 28 July 2016")
-clinic_table <- clinic_table[1:20,]
+clinic_table <- clinic_table[1:26,]
 clinic_names <- clinic_table$Clinic.Name
+
+path2 <- "abbreviated measure names.xlsx"
+measname_table <- read.xlsx(path2,sheet="Sheet1")
 
 #load the googlesheet
 #gskey2 <- c("1dN9rj--OEghw7DdOO0f0y1dcObm2GQwvpbEPWcvAZUU")
@@ -61,7 +64,7 @@ df_melt1 <- df_melt
 df_melt <- goal_melt_df(df_melt)
 
 #read clinic names and short names, append short_names to df_melt
-df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet="short_names", rows=c(1:21))
+df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet="short_names", rows=c(1:27))
 
 #now trim trailing white spaces
 df_clinic_names$Short.Name <- trim.trailing(df_clinic_names$Short.Name)
