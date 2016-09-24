@@ -21,7 +21,7 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       em(
         span("Created by "),
         a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-        span("1 August 2016"),
+        span("updated 18 September 2016"),
         br(), br()
       )
     )
@@ -83,7 +83,7 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
                               )
                             ),
                            br(),
-                           dataTableOutput("df_data_out"))
+                           DT::dataTableOutput("df_data_out"))
       )
      )
     )
