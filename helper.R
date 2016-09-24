@@ -147,7 +147,7 @@ goal_melt_df <- function(df1) {
 #df is melted df, y-goal will need to be extracted from the file, p_nrow is the number of rows in the facet plot 
 p_by_measure <- function(df,MName,p_nrow){
   
-  dfB <- droplevels(df[df$Measure==MName,])
+  dfB <- droplevels(df[df$MeasName==MName,])
   
   #Set up axis label and goals for Measure variables of type M or N and D REVISE THIS LOGIC, ugly.
   if(dfB$MeasType[1]=="M" | dfB$Measure[1]=="OPM1" | dfB$Measure[1] == "OPM5"){
@@ -192,11 +192,11 @@ p_by_measure <- function(df,MName,p_nrow){
   if(dfB$MeasType[1]=="M" | dfB$MeasType[1]=="OPM"){
     p31 <- p21 + geom_line(aes(x=MeasMonth,y=Goal), 
                            lty=1,colour="green")+
-      ggtitle(paste0(MName," by Clinic
+      ggtitle(paste0(MName," by Health Center, ordered by CRA patient volume, largest to smallest
                      Series median: dashed line; Goal: solid line."))
     
   } else {
-    p31 <- p21 + ggtitle(paste0(MName," by Clinic; Series median: dashed line."))
+    p31 <- p21 + ggtitle(paste0(MName," by Health Center ordered by CRA patient volume; Series median: dashed line."))
   } 
   return(p31)
   }
@@ -293,7 +293,8 @@ p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625, trbl
     theme(plot.margin=unit(trbl1,"cm"))+
     theme(aspect.ratio=asp_ratio)+
     xlab(" ")+
-    ggtitle(paste0(meas_name))
+    #ggtitle(paste0(meas_name))
+    ggtitle(dfA$MeasName[1])
  
   if(!x_axis_lab){
     p1 <- p1+ theme(axis.title.x=element_blank())
