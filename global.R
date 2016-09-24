@@ -14,6 +14,7 @@ library(reshape2)
 library(stats)
 library(tidyr)
 library(shiny)
+library(DT)
 library(shinyapps)
 library(openxlsx)
 library(googlesheets) 
@@ -28,16 +29,11 @@ clinic_table <- clinic_table[1:26,]
 clinic_names <- clinic_table$Clinic.Name
 
 path2 <- "abbreviated measure names.xlsx"
-measname_table <- read.xlsx(path2,sheet="Sheet1")
+measname_table <- read.xlsx(path2,sheet="lookup")
 
 #load the googlesheet
-#gskey2 <- c("1dN9rj--OEghw7DdOO0f0y1dcObm2GQwvpbEPWcvAZUU")
-#gskey2 <- c("1m6oVBbHRKb3UuDyImH1Tvl2nUXkQTwLi3Le2kwsciC4")
-#working sheet July 2016
-#gskey2 <- c("1tOYZfT6ZGRw06UabraijdgXtPu_J4a6oifvlWwRfsXg")
-#master sheet with 20 clinics updated 5 Aug 2016
-#gskey2 <- c("12XUHTunbyWQDG7eXusKPk3zJBAsjIBcj4ipCq_h4wHA")
-#gskey2 <- c("1ia4R53Q1P8EGy5Yg4CKq0iCFk9CNOSV1Z73jhZ677IA")
+
+#working sheet NNOHA Dental Dashboard Tracking Tool 30 Aug 2016:  take the coded from the URL of the sheet
 gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
 gsobj <- gs_key(x=gskey2)
 
@@ -61,7 +57,7 @@ df_melt$MeasType <- measure_type_maker(df_melt)
 df_melt1 <- df_melt
 
 #strip off goals and associate goals with the measures
-df_melt <- goal_melt_df(df_melt)
+df_melt <- droplevels(goal_melt_df(df_melt))
 
 #read clinic names and short names, append short_names to df_melt
 df_clinic_names <- read.xlsx("Applications and selections  07-29-16.xlsx",sheet="short_names", rows=c(1:27))
@@ -79,6 +75,7 @@ df_melt1$MeasName <- plyr::mapvalues(df_melt1$Measure,from=measname_table$Code,m
 # meas_subset <- levels(df_melt$Measure)[1:12]
 
 #create a factor vector with measure names to match wide format in ui Data Table: 2016 records
+#this variable is used to create the table ui output and to determine the correct axis labels for plots
 MNames <- levels(df_melt1$Measure)[seq(3,42, by=3)]
 #str(MNames)
 #now create a vector of measure names
@@ -89,8 +86,27 @@ MeasName2 <- as.data.frame(sapply(MNames,rep, 36,simplify=TRUE), stringsAsFactor
 MeasName2.1<- stack(MeasName2)
 MeasName2.2 <- MeasName2.1$values
 MeasName <- c(MeasName1.2,MeasName2.2)
-MeasName <- factor(MeasName, levels=c("OM1","PM1","PM2","PM3",
-                                      "PM4","PM5","PM6","PM7","OPM1",
-                                      "OPM2","OPM3_d","OPM3_h","OPM4","OPM5"))
-#Now change to MeasName with character string names
-MeasNameChar <- plyr::mapvalues(MeasName,from=measname_table$Code,measname_table$Abbreviation)
+code_meas <- c("OM1","PM1","PM2","PM3",
+               "PM4","PM5","PM6","PM7","OPM1",
+               "OPM2","OPM3_d","OPM3_h","OPM4","OPM5")
+MeasName <- factor(MeasName, levels= code_meas)
+name_meas <- c("New Caries at Recall",
+                "Caries Risk Assess",
+                "Sealants 6-9 yrs",
+                "Self-Mgmt Goal Rev",
+                "Trt Plan Completion",
+                "Risk-based Recall",
+                "Sealants 10-14 yrs",
+                "Topical Fluoride",
+                "No Shows",
+                "Gross Chrgs/Enctr",
+                "Dentist Enctrs/Hr",
+                "Hygienist Enctrs/Hr",
+                "Direct Costs/Visit",
+                "Recommendation")
+#Now create the variable that substitutes the abbreviated names for the codes, to use in the output table
+MeasNameChar <- plyr::mapvalues(MeasName,code_meas,name_meas)
+
+#Now reorder the clinics to match the patient volume given by the CRA denominator, PM1_D largest to smallest
+df_melt <- reorder_df(df_melt)
+df_melt1 <- reorder_df(df_melt1)
