@@ -123,6 +123,10 @@ observeEvent(input$Update1,{
                    #append shortnames column
                    df_new1$ShortName <- plyr::mapvalues(df_new1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
                    df_new2$ShortName <- plyr::mapvalues(df_new2$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+                   
+                   #append measure names column:  df_new1 has the 42 measures; df_new2 has the 42 measures and 14 goals
+                   df_new1$MeasName <- plyr::mapvalues(df_new1$Measure,from=measname_table$Code,measname_table$Abbreviation)
+                   df_new2$MeasName <- plyr::mapvalues(df_new2$Measure,from=measname_table$Code,measname_table$Abbreviation)
                    #order the clinics by PM1_D values, largest to smallest
                    df_new1 <- reorder_df(df_new1)
                    df_new2 <- reorder_df(df_new2)
@@ -138,8 +142,11 @@ observeEvent(input$Update1,{
   
   measure_choice <- reactive({
     data <- values$df_data
+    #ggplot throws an error message is all the data in the plotted variable is NA so we have to return only measure names
+    #with at least one value not NA
+    data <- droplevels(data[!is.na(data$value),])
     if(!is.null(data)) {
-      levs <- levels(as.factor(data$Measure))
+      levs <- levels(as.factor(data$MeasName))
       return(levs)
     }
   })
@@ -172,11 +179,14 @@ observeEvent(input$Update1,{
   
   measure_plot <- reactive({
     measure <- input$choose_Meas
+    #measure <- "Caries Risk Assess"
     data <-  values$df_data
     if(!is.null(data) && !is.null(measure)) {
       p_m2 <- p_by_measure(df=data,MName=measure,p_nrow=5)
     }
   })
+  #idea from https://groups.google.com/forum/#!msg/shiny-discuss/u7gwXc8_vyY/IZK_o7b7I8gJ to create non-reactive fcn
+  # enables printing of object that can then be downloaded
   
   measure_plot0 <- function(){
     measure <- input$choose_Meas
@@ -203,7 +213,8 @@ observeEvent(input$Update1,{
                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=20)))
   })
    
-  #idea from https://groups.google.com/forum/#!msg/shiny-discuss/u7gwXc8_vyY/IZK_o7b7I8gJ tp create non-reactive fcn
+  #idea from https://groups.google.com/forum/#!msg/shiny-discuss/u7gwXc8_vyY/IZK_o7b7I8gJ to create non-reactive fcn
+  # enables printing of object that can then be downloaded
   team_plot0 <- function(){
     #need to revise subset of measures during 2016-17 as we add reporting requirement
     meas_subset1 <- c("OM1","PM1","PM2","OPM1")
@@ -231,7 +242,7 @@ observeEvent(input$Update1,{
       paste0(input$choose_Meas, "_", Sys.Date(),'.png') 
     },
     content = function(file) {
-      png(file)
+      png(file, width=800,height=640)
       print(measure_plot0())
       dev.off()
     }
@@ -242,7 +253,7 @@ observeEvent(input$Update1,{
       paste0(input$choose_Team, "_", Sys.Date(),'.png') 
     },
     content = function(file) {
-      png(file)
+      png(file, width=720, height=720)
       print(team_plot0())
       dev.off()
     }
@@ -250,17 +261,24 @@ observeEvent(input$Update1,{
   
   output$clinic_name <- renderText(input$choose_Team)
   
-  output$df_data_out <- renderDataTable({
+  output$df_data_out <- DT::renderDataTable({
     team <- input$choose_Team
     data <- values$df_data1
     df_out1 <- droplevels(data[data$ShortName==team,])
     df_out1$MeasType <- as.factor(df_out1$MeasType)
     df_out1$MeasType[df_out1$MeasType=="Goal_OPM"] <- "Goal"
     df_out1$MeasType[df_out1$MeasType=="OPM"] <- "M"
-    df_out2 <- cbind.data.frame(df_out1,MeasName)
-    df_out3<- dcast(data=df_out2,MeasMonth + MeasName ~ MeasType)
-    df_out4 <- df_out3[order(df_out3$MeasName),c(1,2,6,3,5,4)]
-    names(df_out4) <- c("Meas. Month","Measure Name", "Numerator", "Denominator", "Measure", "Goal")
-    df_out4 <- df_out4[!is.na(df_out4$Numerator), ]
-  })
+    df_out2 <- cbind.data.frame(df_out1,MeasNameChar)
+    df_out3<- dcast(data=df_out2,MeasMonth + MeasNameChar ~ MeasType)
+    df_out4 <- df_out3[order(df_out3$MeasNameChar),c(1,2,6,3,5,4)]
+    names(df_out4) <- c("Meas. Month","Measure Name", "Numerator", "Denominator", "Measure Value", "Goal")
+    df_out4[,5] <- round(x=df_out4[,5],digits=1)
+    df_out4 <- df_out4[!is.na(df_out4$Numerator),] 
+    }, 
+    rownames=FALSE,
+    options= list(
+      columnDefs = list(list(className = 'dt-center', targets = 0:5))
+    )
+  )
+  
 })
