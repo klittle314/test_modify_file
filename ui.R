@@ -50,7 +50,6 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       htmlOutput("selectTeam"),
       br()
       
-
     ),
     mainPanel(
       bsModal(
