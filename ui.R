@@ -1,38 +1,91 @@
+#references for conditional view of update action button are 
+#http://shiny.rstudio.com/articles/dynamic-ui.html and http://shiny.rstudio.com/articles/dynamic-ui.html
 
-  shinyUI(fluidPage(
-    titlePanel("NNOHA Collaborative Data Page"),
+
+shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
+  
+  tabPanel("Overview",
+    img(src='logo.png', align = "top"),
+    h3("Web App: Update NNOHA Collaborative Master Data and Display Measures"),
+    wellPanel(
+      tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
+      helpText("Click on the Update/Display tab to:"),
+      helpText("(1) Upload data using the Excel file for your health center"),
+      helpText("(2) View measures by health center and health centers by measures"),
+               
+      br(),
+      helpText("Questions? Contact Kevin Little, Ph.D., NNOHA Collaborative Improvement Advisor"),
+      
+      # author info
+      shiny::hr(),
+      em(
+        span("Created by "),
+        a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
+        span("updated 18 September 2016"),
+        br(), br()
+      )
+    )
+  ), 
     
+    
+  tabPanel("Update/Display",
     sidebarLayout(
       sidebarPanel(
-        # selectInput("choose_clinic", label = h3("Select clinic"), 
-        #             choices = clinic_list, 
-        #             selected = 1),
-        # 
-        # br(),
-        
-        fileInput('file1', 'Upload Clinic Data Template',
-                  accept=c('.xlsx','.xls')), 
       
-        #drop down to select the Measure
-        htmlOutput("selectMeasures"),
-        
-        #drop down to select the Team
-        htmlOutput("selectTeam")
-      #actionButton("Update1", "Update the data file"),
-      #actionButton("Update2", "Update display")
-      ),
+      
+      fileInput('file1', label=h4("Upload Your Health Center's Excel Data File"),
+                accept=c('.xlsx','.xls')),
+      
+      textOutput("excel_confirmation"),
+      
+      br(),
+      #conditional UI
+      uiOutput("uploadbutton"),
+      
+      br(),
+      #drop down to select the Measure
+      htmlOutput("selectMeasures"),
+      
+      #drop down to select the Health Center
+      htmlOutput("selectTeam"),
+      br()
+      
+    ),
     mainPanel(
       bsModal(
         id = 'gs_data_exchange_modal',
-        title = 'Exchanging Data with Google Drive',
-        h4('This communication may take up to 60 seconds, please wait for screen to refresh.'),
-        trigger = 'file1'),
+        title = 'Data exchange with Google Drive successful.',
+        h4('Please close this window to continue.'),
+        trigger = 'Update1'),
       tabsetPanel(type="tabs",
                   
-        tabPanel("table",dataTableOutput("df_data_out")),
-        tabPanel("Measure by Team",
-                 plotOutput("measure_plot",height="800px"))
+                  tabPanel("Measure by Health Center",
+                           plotOutput("measure_plot2",height="750px"),
+                           br(),
+                           h4("Click to download a .png picture of this display"),
+                           br(),
+                           downloadButton('downloadMPlot', 'Download')),
+                  tabPanel("Health Center Measures",
+                           plotOutput("team_plot2", height="600px"),
+                           br(),
+                           h4("Click to download a .png picture of this display"),
+                           br(),
+                           downloadButton('downloadHCPlot', 'Download')),
+                          
+                  tabPanel("Health Center Data Table",
+                           textOutput("clinic_name"),
+                           h4("Records with numerator and denominator values"),
+                           tags$head(tags$style("#clinic_name{color: black;
+                                 font-size: 20px;
+                                                font-style: normal;
+                                                }"
+                              )
+                            ),
+                           br(),
+                           DT::dataTableOutput("df_data_out"))
       )
+     )
     )
-  )))
-  
+  )
+ )
+)
