@@ -26,5 +26,5 @@ if("Summary_Data" %in% list_sheets) {
 }
 #reinitialize gs object
 gsobj <- gs_key(x=gskey2)
-gs_ws_new(ss=gsobj,ws="Summary_Data",col_extent=55,input=df_master1,anchor="A1")
+gs_ws_new(ss=gsobj,ws="Summary_Data",col_extent=58,input=df_master1,anchor="A1")
 
