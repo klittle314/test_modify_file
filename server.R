@@ -17,7 +17,7 @@ shinyServer(function(input, output, session) {
                     } else if(nrow(df_clinic) != 36) {
                       out_message <- paste0("Data Table worksheet has ",nrow(df_clinic),"  rows; we require 36 data rows.")
                     } else if(ncol(df_clinic) != 59) {
-                      out_message <- paste0("Data Table worksheet has ",ncol(df_clinic)," columns; we require 55 columns.")
+                      out_message <- paste0("Data Table worksheet has ",ncol(df_clinic)," columns; we require 59 columns.")
                     } else {
                       out_message <- "Spreadsheet passes basic checks."
                     }
