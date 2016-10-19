@@ -9,9 +9,8 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
     h3("Web App: Update NNOHA Collaborative Master Data and Display Measures"),
     wellPanel(
       tags$style(type="text/css", '#leftPanel { width:200px; float:left;}'),
-      helpText("Click on the Update/Display tab to:"),
-      helpText("(1) Upload data using the Excel file for your health center"),
-      helpText("(2) View measures by health center and health centers by measures"),
+      helpText("(1) Click on the Update tab to upload data using the Excel file for your health center"),
+      helpText("(2) Click on the Display tab to view measures by health center and health centers by measures"),
                
       br(),
       helpText("Questions? Contact Kevin Little, Ph.D., NNOHA Collaborative Improvement Advisor"),
@@ -21,19 +20,19 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       em(
         span("Created by "),
         a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-        span("updated 18 September 2016"),
+        span("updated 19 October 2016"),
         br(), br()
       )
     )
   ), 
     
     
-  tabPanel("Update/Display",
+  tabPanel("Update",
     sidebarLayout(
       sidebarPanel(
       
       
-      fileInput('file1', label=h4("Upload Your Health Center's Excel Data File"),
+      fileInput('file1', label=h3("Upload Your Health Center's Excel Data File"),
                 accept=c('.xlsx','.xls')),
       
       textOutput("excel_confirmation"),
@@ -43,12 +42,8 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       uiOutput("uploadbutton"),
       
       br(),
-      #drop down to select the Measure
-      htmlOutput("selectMeasures"),
-      
-      #drop down to select the Health Center
-      htmlOutput("selectTeam"),
       br()
+      
       
     ),
     mainPanel(
@@ -56,8 +51,24 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
         id = 'gs_data_exchange_modal',
         title = 'Data exchange with Google Drive successful.',
         h4('Please close this window to continue.'),
-        trigger = 'Update1'),
-      tabsetPanel(type="tabs",
+        trigger = 'Update1')
+      )
+    )
+  ),
+     
+  tabPanel("Display",
+           sidebarLayout(
+             sidebarPanel( 
+      h3("View Collaborative Data by selecting a Measure or a Health Center"),
+      #drop down to select the Measure
+      htmlOutput("selectMeasures"),
+      
+      #drop down to select the Health Center
+      htmlOutput("selectTeam"),
+      br()
+    ),
+    mainPanel(
+        tabsetPanel(type="tabs",
                   
                   tabPanel("Measure by Health Center",
                            plotOutput("measure_plot2",height="750px"),
