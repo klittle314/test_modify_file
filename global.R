@@ -32,6 +32,8 @@ path2 <- "abbreviated measure names.xlsx"
 measname_table <- read.xlsx(path2,sheet="lookup")
 
 #load the googlesheet
+#test sheet to avoid contaminating the master data table: TEST_NNOHA Dental Dashboard Tracking Tool 30 Aug 2016
+#gskey2 <- c("1moCxJ0bw5D0B3OqZ-iqJhN8MUMyhiwJx9U5_aWPQYlo")
 
 #working sheet NNOHA Dental Dashboard Tracking Tool 30 Aug 2016:  take the coded from the URL of the sheet
 gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
@@ -90,7 +92,7 @@ code_meas <- c("OM1","PM1","PM2","PM3",
                "PM4","PM5","PM6","PM7","OPM1",
                "OPM2","OPM3_d","OPM3_h","OPM4","OPM5")
 MeasName <- factor(MeasName, levels= code_meas)
-name_meas <- c("New Caries at Recall",
+name_meas <- c("Caries at Recall",
                 "Caries Risk Assess",
                 "Sealants 6-9 yrs",
                 "Self-Mgmt Goal Rev",
