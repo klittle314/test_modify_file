@@ -1,0 +1,74 @@
+---
+title: "Report on NNOHA Teams Data Submission"
+author: "Kevin Little"
+date: "October 22, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(Rcpp)
+library(ggplot2)
+library(scales)
+library(grid)
+library(gridExtra)
+library(gtable)
+library(GGally)
+# library(plyr)
+# library(dplyr)
+library(reshape2)
+library(stats)
+library(tidyr)
+library(shiny)
+library(DT)
+library(shinyapps)
+library(openxlsx)
+library(googlesheets) 
+library(zoo)
+library(shinyBS)
+library(ezknitr)
+source("helper.R")
+
+
+#load the googlesheet
+#test sheet to avoid contaminating the master data table: TEST_NNOHA Dental Dashboard Tracking Tool 30 Aug 2016
+#gskey2 <- c("1moCxJ0bw5D0B3OqZ-iqJhN8MUMyhiwJx9U5_aWPQYlo")
+
+#working sheet NNOHA Dental Dashboard Tracking Tool 30 Aug 2016:  take the coded from the URL of the sheet
+gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
+gsobj <- gs_key(x=gskey2)
+
+#retrieve google sheet data, force as data.frame else the object is a tbl that seems to confuse other
+#functions expecting a dataframe
+
+df_master1 <- as.data.frame(gs_read(ss=gsobj,ws="Summary_Data"))
+#assumes the Summary Data has already been cleaned--starts in a clean state.
+df_master1 <- clean_up_df1(df_master1)
+```
+### Report on NNOHA Collab Phase 2 data submission
+
+
+```{r report, echo=FALSE}
+cat(paste0("Report Date: ",Sys.Date()))
+report_check <- function(month_check){
+	df00 <- df_master1[df_master1$MeasMonth==month_check,c(1,3,(seq(6,45,3)))]
+	df0 <- df00[,c(3:16)]
+	month_year <- format(as.Date(month_check),"%B %Y")
+#get index of rows with all na
+	df10 <- df00[rowSums(is.na(df00[,c(3:16)])) !=ncol(df0),]
+	data_id1 <- rep(paste("at least one value reported for", month_year),nrow(df10))
+	df11 <- df00[rowSums(is.na(df00[,c(3:16)])) ==ncol(df0),]
+	data_id2 <- rep(paste("no measures reported for",month_year),nrow(df11))
+	out_list<- list(df10,data_id1,df11,data_id2)
+}
+
+Month_check1 <- "2016-09-01"
+out1 <- report_check(Month_check1)
+
+cat(paste0(nrow(out1[[1]])," health centers with ", out1[[2]][1]))
+out1[[1]]$ClinicName
+
+cat(paste0(nrow(out1[[3]])," health centers with ", out1[[4]][1]))
+out1[[3]]$ClinicName
+```
+
