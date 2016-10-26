@@ -94,9 +94,35 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
                             ),
                            br(),
                            DT::dataTableOutput("df_data_out"))
+                  
       )
      )
     )
+  ),
+  tabPanel("Admin",
+           sidebarLayout(
+             sidebarPanel(
+               selectInput("select_month", label=h3("Select month"),
+                           choices=list("Sept-2016"="2016-09-01","Oct-2016"="2016-10-01",
+                                        "Nov-2016"="2016-11-01"),
+                           selected = "2016-09-01")
+             ),
+             
+             mainPanel(
+               textOutput("report0"),
+               br(),
+               textOutput("report1"),
+               br(),
+               tableOutput("report2"),
+               br(),
+               textOutput("report3"),
+               br(),
+               tableOutput("report4")
+             )
+             
+           )
+           
+           
   )
  )
 )
