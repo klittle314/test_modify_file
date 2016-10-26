@@ -308,3 +308,17 @@ p_by_team2 <- function(df,Clinic_Name,meas_name,x_axis_lab, asp_ratio=.625, trbl
   }
   return(p12) 
 }
+
+report_check <- function(month_check){
+  df00 <- df_master1[df_master1$MeasMonth==month_check,c(1,3,(seq(6,45,3)))]
+  df0 <- df00[,c(3:16)]
+  month_year <- as.character(format(as.Date(month_check),"%B %Y"))
+  #get index of rows with all na
+  df10 <- df00[rowSums(is.na(df00[,c(3:16)])) !=ncol(df0),]
+ #data_id1 <- rep(paste("at least one value reported for", month_year),nrow(df10))
+  data_id1 <- paste("at least one value reported for ", month_year)
+  df11 <- df00[rowSums(is.na(df00[,c(3:16)])) ==ncol(df0),]
+# data_id2 <- rep(paste("no measures reported for",month_year),nrow(df11))
+  data_id2 <- paste("no measures reported for",month_year)
+  out_list<- list(df10,data_id1,df11,data_id2)
+}
