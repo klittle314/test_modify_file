@@ -281,4 +281,37 @@ observeEvent(input$Update1,{
     )
   )
   
+  report_out <- reactive({
+    Month_check1 <- as.Date(input$select_month)
+    out10 <- report_check(Month_check1)
+  })
+  
+  output$report0 <- renderText({
+      item0 <- paste0("Report Date: ",Sys.Date())
+  })
+  
+  output$report1 <- renderText({
+    out1 <- report_out()
+    item1 <- paste0(nrow(out1[[1]])," health centers with ", out1[[2]][1])
+  })
+      
+  output$report2 <- renderTable({
+    out1 <- report_out()
+    item2 <- data.frame(out1[[1]]$ClinicName)
+    names(item2)[1] <- "Reporting Data"
+    return(item2)
+  })
+  
+  output$report3 <- renderText({
+    out1 <- report_out()
+    item3 <- paste0(nrow(out1[[3]])," health centers with ", out1[[4]][1])
+  })
+  
+  output$report4 <- renderTable({
+    out1 <- report_out()
+    item4 <- data.frame(out1[[3]]$ClinicName)
+    names(item4)[1] <- "Not Reporting Data"
+    return(item4)
+  })
+  
 })
