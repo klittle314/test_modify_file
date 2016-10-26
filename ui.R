@@ -104,7 +104,15 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
              sidebarPanel(
                selectInput("select_month", label=h3("Select month"),
                            choices=list("Sept-2016"="2016-09-01","Oct-2016"="2016-10-01",
-                                        "Nov-2016"="2016-11-01"),
+                                        "Nov-2016"="2016-11-01",
+                                        "Dec-2016"="2016-12-01",
+                                        "Jan-2017"="2017-01-01",
+                                        "Feb-2017"="2017-02-01",
+                                        "Mar-2017"="2017-03-01",
+                                        "Apr-2017"="2017-04-01",
+                                        "May-2017"="2017-05-01",
+                                        "Jun-2017"="2017-06-01"
+                                        ),
                            selected = "2016-09-01")
              ),
              
