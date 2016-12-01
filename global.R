@@ -1,5 +1,5 @@
 #shiny app allows users to load data from an Excel template to update a master Google sheet
-# Kevin Little, Ph.D.  Informing Ecological Design, LLC  June-Sept 2016
+# Kevin Little, Ph.D.  Informing Ecological Design, LLC  June-Nov 2016
 
 library(Rcpp)
 library(ggplot2)
