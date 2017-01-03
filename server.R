@@ -201,14 +201,14 @@ observeEvent(input$Update1,{
   
   team_plot <- reactive({
     #for testing only, make measure subset dynamic or at least by reference
-    meas_subset1 <- c("OM1","PM1","PM2","OPM1")
+    meas_subset1 <- c("OM1","PM1","PM2","PM3", "PM4","PM6","OPM1")
     team <- input$choose_Team
     data <- values$df_data
     # if(!is.null(data) && !is.null(team)) {
     
     p_list<- lapply(meas_subset1,p_by_team2,df=data,Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8)
     p_out <- grid.arrange(grobs=p_list, 
-                          ncol=2, 
+                          ncol=3, 
                           top=textGrob(team, gp=gpar(fontsize=20)),
                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=20)))
   })
@@ -217,14 +217,14 @@ observeEvent(input$Update1,{
   # enables printing of object that can then be downloaded
   team_plot0 <- function(){
     #need to revise subset of measures during 2016-17 as we add reporting requirement
-    meas_subset1 <- c("OM1","PM1","PM2","OPM1")
+    meas_subset1 <- c("OM1","PM1","PM2","PM3", "PM4","PM6","OPM1")
     team <- input$choose_Team
     data <- values$df_data
     # if(!is.null(data) && !is.null(team)) {
     
     p_list<- lapply(meas_subset1,p_by_team2,df=data,Clinic_Name=team,x_axis_lab=TRUE,asp_ratio=5/8,trbl1=c(0,.5,0,.5))
     p_out <- grid.arrange(grobs=p_list, 
-                          ncol=2, 
+                          ncol=3, 
                           top=textGrob(team, gp=gpar(fontsize=20)),
                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=14)))
   }
