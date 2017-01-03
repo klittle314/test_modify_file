@@ -46,6 +46,11 @@ df_master1 <- as.data.frame(gs_read(ss=gsobj,ws="Summary_Data"))
 #assumes the Summary Data has already been cleaned--starts in a clean state.
 df_master1 <- clean_up_df1(df_master1)
 
+#pull in the annotation table and reformat dates
+df_notes1 <- as.data.frame(gs_read(ss=gsobj,ws="Notes_Table"))
+df_notes1$StartDate <- as.Date(df_notes1$StartDate,format="%m/%d/%Y")
+df_notes1$EndDate <- as.Date(df_notes1$EndDate,format="%m/%d/%Y")
+
 #now melt the df for manipulation, omitting the Reporting Month, column 2 and setting up for plotting
 df_melt <- melt(df_master1[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
 
