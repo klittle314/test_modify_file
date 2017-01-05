@@ -12,16 +12,19 @@ shinyServer(function(input, output, session) {
   excel_confirmation <- eventReactive(input$file1, {
                     df_clinic <- read.xlsx(input$file1$datapath, sheet="Data Table", startRow=4,cols=c(1:59),detectDates=TRUE)
                     #read in Notes sheet AND TRAP ERROR
-                    df_notes_clinic <- read.xlsx(input$file1$datapath, sheet="Notes", startRow=1,cols=c(1:4),detectDates=TRUE)
+                    df_notes_clinic <- try(
+                      read.xlsx(input$file1$datapath, sheet="Notes", startRow=1,cols=c(1:5),detectDates=TRUE))
                     
                     clinic_name <- df_clinic$ClinicName[1]
-                  
+
                     if(!(clinic_name %in% unique(df_master1$ClinicName))) {
                       out_message <- "Clinic name does not match our collaborative list."
                     } else if(nrow(df_clinic) != 36) {
                       out_message <- paste0("Data Table worksheet has ",nrow(df_clinic),"  rows; we require 36 data rows.")
                     } else if(ncol(df_clinic) != 59) {
                       out_message <- paste0("Data Table worksheet has ",ncol(df_clinic)," columns; we require 59 columns.")
+                    } else if (is(df_notes_clinic, 'try-error')) {
+                      out_message <- 'Notes sheet not found in uploaded data.'                      
                     } else {
                       out_message <- "Spreadsheet passes basic checks."
                     }
@@ -55,6 +58,17 @@ df_clinic <- reactive({
       df_clinicA <- NULL
   }
 })
+
+df_notes <- reactive({
+  if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")){
+    out <- read.xlsx(input$file1$datapath, sheet="Notes", startRow=1,cols=c(1:5),detectDates=TRUE)
+    names(out) <- names(df_notes1)
+  } else {
+    out <- NULL
+  }
+  
+  return(out)
+})
   
 
 
@@ -82,6 +96,7 @@ observeEvent(input$Update1,{
                             session = session,
                             modalId = 'gs_data_exchange_modal',
                             toggle = 'close')  
+  
                      df_clinicA <- df_clinic()
                      clinic_name <- df_clinicA$ClinicName[1]
                      #delete clinic records from the master file
@@ -139,11 +154,64 @@ observeEvent(input$Update1,{
                    #update the clinic name, using the short name
                    values$clinic_name <- df_clinic_names$Short.Name[grep(clinic_name,df_clinic_names$Clinic.Name)]
                   
-
-                                  
+                   
+                   ## Processing notes data here
+                   
+                   df_clinic_notes <- df_notes()
+                   #delete clinic records from the master file
+                   df_all_but_clinic <- df_notes1[df_notes1$ClinicName!=clinic_name,]
+                   #need to add 1 to index because the first row of the googlesheet is a header row, not data
+                   idx_start_old <- match(clinic_name,df_notes1$ClinicName)
+                   nrec_clinic_old <- sum(df_notes1$ClinicName==clinic_name)
+                   idx_end_old <- idx_start_old + nrec_clinic_old-1  #
+                   
+                   #get the index of records for clinic in df_clinic
+                   nrec_clinic_new <- nrow(df_clinic_notes)
+                   #diagnostic print
+                   cat(file=stderr(),"nrec clinic notes old",nrec_clinic_old,"nrec clinic notes new",nrec_clinic_new,"\n")
+                   cat(file=stderr(), "check identical function",isTRUE(all.equal(nrec_clinic_old,nrec_clinic_new)),"\n")
+                   
+                   #define the cell in the first row of the clinic's records in df_master1 and the google sheet
+                   anchor1 <- paste0("A",as.character(idx_start_old+1))
+                   
+                   
+                   if(isTRUE(base::all.equal(nrec_clinic_old,nrec_clinic_new))) {
+                     #since the new record set has same number of rows as old record set, simply replace old with new df
+                     gs_edit_cells(ss=gsobj,ws="Notes_Table",input=df_clinic_notes,col_names=FALSE,anchor=anchor1)
+                     df_notes1[idx_start_old:idx_end_old,] <- df_clinic_notes
+                   } else cat(file=stderr(),"records of uploaded file do not match master file")
+                   #now create the revised dataframe to use in plotting and summaries by the Shiny app         
+                   df_notes_new <- df_notes1
+                   
+                   # ??MD: Assuming none of the following needs to happen for the notes data?
+                   #       If correct, delete this on next commit.
+                   
+                   # #now create a melted, reduced version of the data frame for manipulation (remove RepMonth variable)
+                   # df_notes_new1 <- melt(df_notes_new[,-2],id.vars=c("ClinicName","MeasMonth"),variable.name="Measure")
+                   # df_notes_new1$ClinicName <- as.factor(df_notes_new1$ClinicName)
+                   # #append measure type column
+                   # df_notes_new1$MeasType <- measure_type_maker(df_notes_new1)
+                   # #make a copy of df_new1 with the goals in the original position
+                   # df_notes_new2 <- df_notes_new1
+                   # 
+                   # #append goals column
+                   # df_notes_new1 <- goal_melt_df(df_notes_new1)
+                   # 
+                   # #append shortnames column
+                   # df_notes_new1$ShortName <- plyr::mapvalues(df_notes_new1$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+                   # df_notes_new2$ShortName <- plyr::mapvalues(df_notes_new2$ClinicName,from=df_clinic_names$Clinic.Name,df_clinic_names$Short.Name)
+                   # 
+                   # #append measure names column:  df_new1 has the 42 measures; df_new2 has the 42 measures and 14 goals
+                   # df_notes_new1$MeasName <- plyr::mapvalues(df_notes_new1$Measure,from=measname_table$Code,measname_table$Abbreviation)
+                   # df_notes_new2$MeasName <- plyr::mapvalues(df_notes_new2$Measure,from=measname_table$Code,measname_table$Abbreviation)
+                   # #order the clinics by PM1_D values, largest to smallest
+                   # df_notes_new1 <- reorder_df(df_notes_new1)
+                   # df_notes_new2 <- reorder_df(df_notes_new2)
+                   
+                   values$df_notes <- df_notes1
+                   
                  })  
 
-  
   measure_choice <- reactive({
     data <- values$df_data
     #ggplot throws an error message is all the data in the plotted variable is NA so we have to return only measure names
