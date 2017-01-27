@@ -20,7 +20,7 @@ shinyServer(function(input, output, session) {
                     } else if(ncol(df_clinic) != 59) {
                       out_message <- paste0("Data Table worksheet has ",ncol(df_clinic)," columns; we require 55 columns.")
                     } else if(code_check != 42762) {
-                      out_message <- "Please confirm that you are using the revised data worksheet distributed Feb 2017"
+                      out_message <- "Data not accepted. Please confirm that you are using the revised data worksheet distributed Feb 2017"
                     } else {
                       out_message <- "Spreadsheet passes basic checks."
                     }
