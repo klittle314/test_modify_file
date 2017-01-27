@@ -83,6 +83,12 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
                            br(),
                            downloadButton('downloadHCPlot', 'Download')),
                           
+                  tabPanel("Health Center Measures Annotations",
+                           textOutput("clinic_name"),
+                           h4("Notes on Measures"),
+                           br(),
+                           DT::dataTableOutput("df_notes_out")),
+                  
                   tabPanel("Health Center Data Table",
                            textOutput("clinic_name"),
                            h4("Records with numerator and denominator values"),
