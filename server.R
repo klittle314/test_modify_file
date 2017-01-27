@@ -45,7 +45,7 @@ output$excel_confirmation <- renderText(excel_confirmation())
 
 df_clinic <- reactive({
       if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")){
-        df_clinicA <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,cols=c(1:59),detectDates=TRUE)
+        df_clinicA <- read.xlsx(input$file1$datapath, sheet="Data Table", startRow=4,cols=c(1:59),detectDates=TRUE)
       #clean clinic data to our standards
     
        df_clinicA <- clean_up_df1(df_clinicA)
@@ -59,6 +59,8 @@ df_clinic <- reactive({
   }
 })
 
+#6 January 2017:  rebuild the df_notes logic so that notes may have more than 36 rows....right now, I mimic the data table structure and the 
+#index logic to maintain the google sheet structure.   There is surely a better way.
 df_notes <- reactive({
   if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")){
     out <- read.xlsx(input$file1$datapath, sheet="Notes", startRow=1,cols=c(1:5),detectDates=TRUE)
@@ -155,11 +157,13 @@ observeEvent(input$Update1,{
                    values$clinic_name <- df_clinic_names$Short.Name[grep(clinic_name,df_clinic_names$Clinic.Name)]
                   
                    
-                   ## Processing notes data here
+                   ## Processing notes data here...if we allow an Excel file to NOT have notes table, then could use 
+                   ## a dummy notes table or have conditional logic to skip the following code.
                    
                    df_clinic_notes <- df_notes()
+                   
                    #delete clinic records from the master file
-                   df_all_but_clinic <- df_notes1[df_notes1$ClinicName!=clinic_name,]
+                   dfnotes_all_but_clinic <- df_notes1[df_notes1$ClinicName!=clinic_name,]
                    #need to add 1 to index because the first row of the googlesheet is a header row, not data
                    idx_start_old <- match(clinic_name,df_notes1$ClinicName)
                    nrec_clinic_old <- sum(df_notes1$ClinicName==clinic_name)
@@ -352,6 +356,12 @@ observeEvent(input$Update1,{
       columnDefs = list(list(className = 'dt-center', targets = 0:5))
     )
   )
+  
+  output$df_notes_out <- DT::renderDataTable({
+    team <- input$choose_Team
+    data <- values$df_notes
+    df_out1 <- droplevels(data[data$ShortName==team,])
+  })
   
   report_out <- reactive({
     Month_check1 <- as.Date(input$select_month)
