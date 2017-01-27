@@ -38,7 +38,7 @@ output$excel_confirmation <- renderText(excel_confirmation())
 
 df_clinic <- reactive({
       if(identical(excel_confirmation(),"Spreadsheet passes basic checks.")){
-        df_clinicA <- read.xlsx(input$file1$datapath, sheet=4, startRow=4,cols=c(1:59),detectDates=TRUE)
+        df_clinicA <- read.xlsx(input$file1$datapath, sheet="Data Table", startRow=4,cols=c(1:59),detectDates=TRUE)
       #clean clinic data to our standards
     
        df_clinicA <- clean_up_df1(df_clinicA)
