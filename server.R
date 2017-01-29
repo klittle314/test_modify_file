@@ -11,8 +11,11 @@ shinyServer(function(input, output, session) {
   excel_confirmation <- eventReactive(input$file1, {
                     df_clinic <- read.xlsx(input$file1$datapath, sheet="Data Table", startRow=4,cols=c(1:59),detectDates=TRUE)
                     df_sheet <- read.xlsx(input$file1$datapath, sheet="Measures", startRow=23,cols=c(2:3),detectDates=TRUE)
+                    if(is.null(df_sheet[1,1])) {
+                      code_check <- 9999
+                    } else code_check <- df_sheet[1,1]
                     clinic_name <- df_clinic$ClinicName[1]
-                    code_check <- df_sheet[1,1]
+                    #code_check <- df_sheet[1,1]
                     if(!(clinic_name %in% unique(df_master1$ClinicName))) {
                       out_message <- "Clinic name does not match our collaborative list."
                     } else if(nrow(df_clinic) != 36) {
