@@ -33,10 +33,10 @@ measname_table <- read.xlsx(path2,sheet="lookup")
 
 #load the googlesheet
 #test sheet to avoid contaminating the master data table: TEST_NNOHA Dental Dashboard Tracking Tool 30 Aug 2016
-#gskey2 <- c("1moCxJ0bw5D0B3OqZ-iqJhN8MUMyhiwJx9U5_aWPQYlo")
+gskey2 <- c("1moCxJ0bw5D0B3OqZ-iqJhN8MUMyhiwJx9U5_aWPQYlo")
 
 #working sheet NNOHA Dental Dashboard Tracking Tool 30 Aug 2016:  take the coded from the URL of the sheet
-gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
+#gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
 gsobj <- gs_key(x=gskey2)
 
 #retrieve google sheet data, force as data.frame else the object is a tbl that seems to confuse other
@@ -95,7 +95,7 @@ MeasName <- factor(MeasName, levels= code_meas)
 name_meas <- c("Caries at Recall",
                 "Caries Risk Assess",
                 "Sealants 6-9 yrs",
-                "Self-Mgmt Goal Rev",
+                "Self-Mgmt Goals",
                 "Trt Plan Completion",
                 "Risk-based Recall",
                 "Sealants 10-14 yrs",
