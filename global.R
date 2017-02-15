@@ -32,8 +32,8 @@ path2 <- "abbreviated measure names.xlsx"
 measname_table <- read.xlsx(path2,sheet="lookup")
 
 #load the googlesheet
-#test sheet to avoid contaminating the master data table: TEST_NNOHA Dental Dashboard Tracking Tool 30 Aug 2016
-#gskey2 <- c("1moCxJ0bw5D0B3OqZ-iqJhN8MUMyhiwJx9U5_aWPQYlo")
+#test sheet to avoid contaminating the master data table: TEST2_NNOHA Dental Dashboard Tracking Tool 30 Aug 2016
+#gskey2 <- c("1uw8PgwqG6fx44RJKnInGGhCDXTswWxz0sDbIv467bA4")
 
 #working sheet NNOHA Dental Dashboard Tracking Tool 30 Aug 2016:  take the coded from the URL of the sheet
 gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
@@ -112,3 +112,5 @@ MeasNameChar <- plyr::mapvalues(MeasName,code_meas,name_meas)
 #Now reorder the clinics to match the patient volume given by the CRA denominator, PM1_D largest to smallest
 df_melt <- reorder_df(df_melt)
 df_melt1 <- reorder_df(df_melt1)
+
+date_end1 <- "2016-12-01"
