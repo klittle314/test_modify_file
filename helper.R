@@ -322,3 +322,47 @@ report_check <- function(month_check){
   data_id2 <- paste("no measures reported for",month_year)
   out_list<- list(df10,data_id1,df11,data_id2)
 }
+
+# function to create median overlay plot;
+median_overlay_plot <- function(df_data,
+                                measure_use,
+                                goal_use, 
+                                date_end,size_median_dot = 3, 
+                                clinic_dot_size=2,
+                                clinic_dot_colour= "gray75",
+                                jitter_width=4,
+                                jitter_height=1){
+  df1 <- droplevels(df_data[df_data$MeasName==measure_use & df_data$MeasMonth <= date_end ,])
+  MeasMonth2 <- unique(df1$MeasMonth)
+  monthly_medians <- as.vector(by(df1$value,df1$MeasMonth,median,na.rm=TRUE))
+  df_medians <- cbind.data.frame(MeasMonth2,monthly_medians)
+  if(is.na(goal_use)) {
+    title_string <- paste0(df1$MeasName[1],"\nEach gray dot is one health center's monthly data; black dots are monthly medians.")
+    p0 <- ggplot(data=df1, aes(x=MeasMonth,y=value))+
+      theme_bw()+
+      xlab("Month")+
+      ylab("Per cent")+
+      geom_jitter(size=clinic_dot_size, 
+                  colour=clinic_dot_colour,
+                  width=jitter_width,
+                  height=jitter_height)+
+      ggtitle(title_string)
+  } else {
+    title_string <- paste0(df1$MeasName[1],"; Dashed line is goal (",goal_use,"%)\nEach gray dot is one health center's monthly data; black dots are monthly medians.")
+    
+    p0 <- ggplot(data=df1, aes(x=MeasMonth,y=value))+
+      theme_bw()+
+      xlab("Month")+
+      ylab("Per cent")+
+      geom_jitter(size=clinic_dot_size, 
+                  colour=clinic_dot_colour,
+                  width=jitter_width,
+                  height=jitter_height)+
+      geom_hline(yintercept = goal_use, linetype="dashed")+
+      ggtitle(title_string) 
+  }
+  
+  p01 <- p0 + geom_point(data=df_medians,aes(MeasMonth2,monthly_medians),size=size_median_dot)+
+    geom_line(data=df_medians,aes(MeasMonth2,monthly_medians))
+  return(p01)
+}
