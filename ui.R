@@ -32,10 +32,11 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       sidebarPanel(
       
       
-     fileInput('file1', label=h3("Upload Your Health Center's Excel Data File"),
-                accept=c('.xlsx','.xls')),
+     # fileInput('file1', label=h3("Upload Your Health Center's Excel Data File"),
+     #            accept=c('.xlsx','.xls')),
       
-       
+    #Mason suggests 16 Feb 2017 to remove the accept restrictions and somehow catch errors of file type otherwise
+        fileInput('file1', label=h3("Upload Your Health Center's Excel Data File")), 
         
       textOutput("excel_confirmation"),
       
