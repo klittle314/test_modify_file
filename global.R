@@ -33,10 +33,10 @@ measname_table <- read.xlsx(path2,sheet="lookup")
 
 #load the googlesheet
 #test sheet to avoid contaminating the master data table: TEST2_NNOHA Dental Dashboard Tracking Tool 30 Aug 2016
-#gskey2 <- c("1uw8PgwqG6fx44RJKnInGGhCDXTswWxz0sDbIv467bA4")
+gskey2 <- c("1uw8PgwqG6fx44RJKnInGGhCDXTswWxz0sDbIv467bA4")
 
 #working sheet NNOHA Dental Dashboard Tracking Tool 30 Aug 2016:  take the coded from the URL of the sheet
-gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
+#gskey2 <- c("1_iIVDAS1gzqr6KYcYZiNicE3o7anPJNXQJTWcrLIfW4")
 gsobj <- gs_key(x=gskey2)
 
 #retrieve google sheet data, force as data.frame else the object is a tbl that seems to confuse other
