@@ -32,9 +32,11 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       sidebarPanel(
       
       
-      fileInput('file1', label=h3("Upload Your Health Center's Excel Data File"),
+     fileInput('file1', label=h3("Upload Your Health Center's Excel Data File"),
                 accept=c('.xlsx','.xls')),
       
+       
+        
       textOutput("excel_confirmation"),
       
       br(),
