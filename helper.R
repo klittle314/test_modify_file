@@ -324,6 +324,12 @@ report_check <- function(month_check){
 }
 
 # function to create median overlay plot;
+########################################
+# Parameter definitions/explanations--what will be passed to this function
+# df_data            default data frame to pass from server.R  values$df_data1, the updated version of df_melt1
+# measure_use        from drop down box input#choose_Mean
+# goal_use
+# date_end
 median_overlay_plot <- function(df_data,
                                 measure_use,
                                 goal_use, 
