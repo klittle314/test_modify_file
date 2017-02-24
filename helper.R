@@ -323,13 +323,30 @@ report_check <- function(month_check){
   out_list<- list(df10,data_id1,df11,data_id2)
 }
 
+#function to find the nearest month for overplot limit
+
+date_limit_overplot <- function(){
+  
+  today <- Sys.Date()
+  day1 <- as.numeric(format(today,"%d"))
+  #monthuse <- ifelse(day1 <=15,today - 65,today-35)
+  if(day1 <= 15) {
+    monthuse <- today - 65
+  } else {
+    monthuse <- today - 35
+  }
+  return(monthuse)
+}
+  
+
+
 # function to create median overlay plot;
 ########################################
 # Parameter definitions/explanations--what will be passed to this function
 # df_data            default data frame to pass from server.R  values$df_data1, the updated version of df_melt1
 # measure_use        from drop down box input#choose_Mean
-# goal_use
-# date_end
+# goal_use           NA except for Caries Risk Assessment and Sealants (6-9 and 10-14)
+# date_end           default:   provided by function date_limit_overplot
 median_overlay_plot <- function(df_data,
                                 measure_use,
                                 goal_use, 
