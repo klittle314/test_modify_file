@@ -358,13 +358,13 @@ median_overlay_plot <- function(df_data,
   
   
   
-  if(meas_name %in% name_meas_pct) {
+  if(measure_use %in% name_meas_pct) {
     y_axis_lab <- "Per Cent"
-  } else if(meas_name %in% name_meas_enctrs) {
+  } else if(measure_use %in% name_meas_enctrs) {
     y_axis_lab <- "Encounters/Hr"
-  } else if(meas_name=="Direct Costs/Visit") {
+  } else if(measure_use=="Direct Costs/Visit") {
     y_axis_lab <- "$/Visit"
-  } else if(meas_name=="Gross Chrgs/Enctr") {
+  } else if(measure_use=="Gross Chrgs/Enctr") {
     y_axis_lab <- "$/Encounter"
   } else y_axis_lab <- "Count"
   df1 <- droplevels(df_data[df_data$MeasName==measure_use & df_data$MeasMonth <= date_end ,])
@@ -376,7 +376,7 @@ median_overlay_plot <- function(df_data,
     p0 <- ggplot(data=df1, aes(x=MeasMonth,y=value))+
       theme_bw()+
       xlab("Month")+
-      ylab("Per cent")+
+      ylab(y_axis_lab)+
       theme(axis.text=element_text(size=rel(1.5)))+
       theme(axis.title=element_text(size=rel(1.75)))+
       geom_jitter(size=clinic_dot_size, 
@@ -391,7 +391,7 @@ median_overlay_plot <- function(df_data,
     p0 <- ggplot(data=df1, aes(x=MeasMonth,y=value))+
       theme_bw()+
       xlab("Month")+
-      ylab("Per cent")+
+      ylab(y_axis_lab)+
       theme(axis.text=element_text(size=rel(1.5)))+
       theme(axis.title=element_text(size=rel(1.75)))+
       geom_jitter(size=clinic_dot_size, 
