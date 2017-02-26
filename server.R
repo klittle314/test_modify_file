@@ -286,7 +286,7 @@ observeEvent(input$Update1,{
       paste0("Overplot_",input$choose_Meas, "_", Sys.Date(),'.png') 
     },
     content = function(file) {
-      png(file, width=720, height=720)
+      png(file, width=900, height=600)
       print(over_plot())
       dev.off()
     }
