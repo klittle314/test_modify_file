@@ -106,6 +106,10 @@ name_meas <- c("Caries at Recall",
                 "Hygienist Enctrs/Hr",
                 "Direct Costs/Visit",
                 "Recommendation")
+
+#subset name_meas for y axis labels
+name_meas_pct <- name_meas[c(1:9,14)]
+name_meas_enctrs <- name_meas[11:12]
 #Now create the variable that substitutes the abbreviated names for the codes, to use in the output table
 MeasNameChar <- plyr::mapvalues(MeasName,code_meas,name_meas)
 
@@ -113,4 +117,4 @@ MeasNameChar <- plyr::mapvalues(MeasName,code_meas,name_meas)
 df_melt <- reorder_df(df_melt)
 df_melt1 <- reorder_df(df_melt1)
 
-date_end1 <- "2016-12-01"
+#date_end1 <- "2016-12-01"

@@ -240,8 +240,30 @@ observeEvent(input$Update1,{
                           bottom=textGrob("Series median: dashed line; Goal: solid line.",gp=gpar(fontsize=14)))
   }
   
+  #overplot code 
+  over_plot <- reactive({
+    measure <- input$choose_Meas
+    data1 <- values$df_data1
+    date_end1 <- date_limit_overplot()
+    #the only measures with goals will be Caries Risk Assessment 95%; Sealants 6-9 yrs 80% and Sealants 10-14 years 80%
+    #just check if measure is one of these before passing to median_overlay_plot
+    if (measure == 'Caries Risk Assess') goal_use <- 95
+    else if (measure == 'Sealants 6-9 yrs') goal_use <- 80
+    else if (measure == 'Sealants 10-14 yrs') goal_use <- 80
+    else goal_use <- NA
+
+    p_out <- median_overlay_plot(df_data=data1,
+                                 measure_use=measure,
+                                 goal_use = goal_use,
+                                 date_end =date_end1)
+  })
+ 
   output$measure_plot2 <- renderPlot({
     print(measure_plot())
+  })
+  
+  output$over_plot <- renderPlot({
+    print(over_plot())
   })
   
   output$team_plot2 <- renderPlot({
@@ -255,6 +277,17 @@ observeEvent(input$Update1,{
     content = function(file) {
       png(file, width=800,height=640)
       print(measure_plot0())
+      dev.off()
+    }
+  )
+  
+  output$downloadOverPlot <- downloadHandler(
+    filename = function() { 
+      paste0("Overplot_",input$choose_Meas, "_", Sys.Date(),'.png') 
+    },
+    content = function(file) {
+      png(file, width=900, height=600)
+      print(over_plot())
       dev.off()
     }
   )
