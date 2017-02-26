@@ -106,6 +106,10 @@ name_meas <- c("Caries at Recall",
                 "Hygienist Enctrs/Hr",
                 "Direct Costs/Visit",
                 "Recommendation")
+
+#subset name_meas for y axis labels
+name_meas_pct <- name_meas[1:9,14]
+name_meas_enctrs <- name_meas[11:12]
 #Now create the variable that substitutes the abbreviated names for the codes, to use in the output table
 MeasNameChar <- plyr::mapvalues(MeasName,code_meas,name_meas)
 
