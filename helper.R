@@ -350,8 +350,8 @@ date_limit_overplot <- function(){
 median_overlay_plot <- function(df_data,
                                 measure_use,
                                 goal_use, 
-                                date_end,size_median_dot = 3, 
-                                clinic_dot_size=2,
+                                date_end,size_median_dot = 4, 
+                                clinic_dot_size=3,
                                 clinic_dot_colour= "gray75",
                                 jitter_width=4,
                                 jitter_height=1){
@@ -365,11 +365,14 @@ median_overlay_plot <- function(df_data,
       theme_bw()+
       xlab("Month")+
       ylab("Per cent")+
+      theme(axis.text=element_text(size=rel(1.5)))+
+      theme(axis.title=element_text(size=rel(1.75)))+
       geom_jitter(size=clinic_dot_size, 
                   colour=clinic_dot_colour,
                   width=jitter_width,
                   height=jitter_height)+
-      ggtitle(title_string)
+      ggtitle(title_string)+
+      theme(plot.title=element_text(size=rel(2.0)))
   } else {
     title_string <- paste0(df1$MeasName[1],"; Dashed line is goal (",goal_use,"%)\nEach gray dot is one health center's monthly data; black dots are monthly medians.")
     
@@ -377,12 +380,15 @@ median_overlay_plot <- function(df_data,
       theme_bw()+
       xlab("Month")+
       ylab("Per cent")+
+      theme(axis.text=element_text(size=rel(1.5)))+
+      theme(axis.title=element_text(size=rel(1.75)))+
       geom_jitter(size=clinic_dot_size, 
                   colour=clinic_dot_colour,
                   width=jitter_width,
                   height=jitter_height)+
       geom_hline(yintercept = goal_use, linetype="dashed")+
-      ggtitle(title_string) 
+      ggtitle(title_string)+
+      theme(plot.title=element_text(size=rel(2.0)))
   }
   
   p01 <- p0 + geom_point(data=df_medians,aes(MeasMonth2,monthly_medians),size=size_median_dot)+
