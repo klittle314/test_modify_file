@@ -344,7 +344,7 @@ date_limit_overplot <- function(){
 ########################################
 # Parameter definitions/explanations--what will be passed to this function
 # df_data            default data frame to pass from server.R  values$df_data1, the updated version of df_melt1
-# measure_use        from drop down box input#choose_Mean
+# measure_use        from drop down box input#choose_Meas
 # goal_use           NA except for Caries Risk Assessment and Sealants (6-9 and 10-14)
 # date_end           default:   provided by function date_limit_overplot
 median_overlay_plot <- function(df_data,
@@ -355,6 +355,18 @@ median_overlay_plot <- function(df_data,
                                 clinic_dot_colour= "gray75",
                                 jitter_width=4,
                                 jitter_height=1){
+  
+  
+  
+  if(meas_name %in% name_meas_pct) {
+    y_axis_lab <- "Per Cent"
+  } else if(meas_name %in% name_meas_enctrs) {
+    y_axis_lab <- "Encounters/Hr"
+  } else if(meas_name=="Direct Costs/Visit") {
+    y_axis_lab <- "$/Visit"
+  } else if(meas_name=="Gross Chrgs/Enctr") {
+    y_axis_lab <- "$/Encounter"
+  } else y_axis_lab <- "Count"
   df1 <- droplevels(df_data[df_data$MeasName==measure_use & df_data$MeasMonth <= date_end ,])
   MeasMonth2 <- unique(df1$MeasMonth)
   monthly_medians <- as.vector(by(df1$value,df1$MeasMonth,median,na.rm=TRUE))
