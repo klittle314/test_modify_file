@@ -252,7 +252,7 @@ observeEvent(input$Update1,{
     else if (measure == 'Sealants 10-14 yrs') goal_use <- 80
     else goal_use <- NA
 
-    p_out <- median_overlay_plot(df_data=data1,
+    p_out <- median_overlay_plot1(df_data=data1,
                                  measure_use=measure,
                                  goal_use = goal_use,
                                  date_end =date_end1)
