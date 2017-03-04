@@ -433,7 +433,7 @@ median_overlay_plot1 <- function(df_data,
   df1 <- droplevels(df_data[df_data$MeasName==measure_use & 
                               df_data$MeasMonth <= date_end &
                               !is.na(df_melt1$value),])
-  MeasMonth2 <- unique(df1$MeasMonth)
+  MeasMonth2 <- sort(unique(df1$MeasMonth))
   monthly_medians <- as.vector(by(df1$value,df1$MeasMonth,median,na.rm=TRUE))
   #call dplyr::count to get the number of organizations reporting each month
   count_orgs <- count(df1,MeasMonth)
@@ -482,6 +482,7 @@ median_overlay_plot1 <- function(df_data,
     p02 <- p01 + geom_text(data=df_medians,aes(MeasMonth2,monthly_medians- 5,
                                                label=as.character(count)))
   } else {
+    
     p02 <- p01 + geom_text(data=df_medians,aes(MeasMonth2,0.9*monthly_medians,
                                                label=as.character(count)))
   }
