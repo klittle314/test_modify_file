@@ -407,3 +407,85 @@ median_overlay_plot <- function(df_data,
     geom_line(data=df_medians,aes(MeasMonth2,monthly_medians))
   return(p01)
 }
+
+#median overlay plot function with counts of organizations overlaid
+median_overlay_plot1 <- function(df_data,
+                                 measure_use,
+                                 goal_use, 
+                                 date_end,size_median_dot = 4, 
+                                 clinic_dot_size=3,
+                                 clinic_dot_colour= "gray75",
+                                 jitter_width=4,
+                                 jitter_height=1){
+  
+  
+  
+  if(measure_use %in% name_meas_pct) {
+    y_axis_lab <- "Per Cent"
+  } else if(measure_use %in% name_meas_enctrs) {
+    y_axis_lab <- "Encounters/Hr"
+  } else if(measure_use=="Direct Costs/Visit") {
+    y_axis_lab <- "$/Visit"
+  } else if(measure_use=="Gross Chrgs/Enctr") {
+    y_axis_lab <- "$/Encounter"
+  } else y_axis_lab <- "Count"
+  #restrict the data frame to the measure, date range and non missing values 
+  df1 <- droplevels(df_data[df_data$MeasName==measure_use & 
+                              df_data$MeasMonth <= date_end &
+                              !is.na(df_melt1$value),])
+  MeasMonth2 <- sort(unique(df1$MeasMonth))
+  monthly_medians <- as.vector(by(df1$value,df1$MeasMonth,median,na.rm=TRUE))
+  #call dplyr::count to get the number of organizations reporting each month
+  count_orgs <- count(df1,MeasMonth)
+  df_medians <- cbind.data.frame(MeasMonth2,monthly_medians,count_orgs$n)
+  names(df_medians)[3] <- "count"
+  if(is.na(goal_use)) {
+    title_string <- df1$MeasName[1]
+    subtitle_string <- "Each gray dot is one health center's monthly data; \nBlack dots are monthly medians with monthly counts below."
+    p0 <- ggplot(data=df1, aes(x=MeasMonth,y=value))+
+      theme_bw()+
+      xlab("Month")+
+      ylab(y_axis_lab)+
+      theme(axis.text=element_text(size=rel(1.5)))+
+      theme(axis.title=element_text(size=rel(1.75)))+
+      geom_jitter(size=clinic_dot_size, 
+                  colour=clinic_dot_colour,
+                  width=jitter_width,
+                  height=jitter_height)+
+      ggtitle(title_string, subtitle=subtitle_string)+
+      theme(plot.title=element_text(size=rel(2.0)))+
+      theme(plot.subtitle=element_text(size=rel(1.5)))
+  } else {
+    title_string <- paste0(df1$MeasName[1],"; Dashed line is goal (",goal_use,"%)")
+    subtitle_string <- "Each gray dot is one health center's monthly data; \nBlack dots are monthly medians with monthly counts below."
+    
+    p0 <- ggplot(data=df1, aes(x=MeasMonth,y=value))+
+      theme_bw()+
+      xlab("Month")+
+      ylab(y_axis_lab)+
+      theme(axis.text=element_text(size=rel(1.5)))+
+      theme(axis.title=element_text(size=rel(1.75)))+
+      geom_jitter(size=clinic_dot_size, 
+                  colour=clinic_dot_colour,
+                  width=jitter_width,
+                  height=jitter_height)+
+      geom_hline(yintercept = goal_use, linetype="dashed")+
+      ggtitle(title_string,subtitle=subtitle_string)+
+      theme(plot.title=element_text(size=rel(2.0)))+
+      theme(plot.subtitle=element_text(size=rel(1.5)))
+  }
+  
+  p01 <- p0 + geom_point(data=df_medians,aes(MeasMonth2,monthly_medians),size=size_median_dot)+
+    geom_line(data=df_medians,aes(MeasMonth2,monthly_medians)) 
+  
+  if(measure_use %in% name_meas_pct) {
+    p02 <- p01 + geom_text(data=df_medians,aes(MeasMonth2,monthly_medians- 5,
+                                               label=as.character(count)))
+  } else {
+    
+    p02 <- p01 + geom_text(data=df_medians,aes(MeasMonth2,0.9*monthly_medians,
+                                               label=as.character(count)))
+  }
+  
+  return(p02)
+}
