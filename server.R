@@ -87,8 +87,9 @@ observeEvent(input$Update1,{
                             toggle = 'close')  
                      df_clinicA <- df_clinic()
                      clinic_name <- df_clinicA$ClinicName[1]
-                     #delete clinic records from the master file
-                     df_all_but_clinic <- df_master1[df_master1$ClinicName!=clinic_name,]
+                     #delete clinic records from the master file 
+                     # this next assignment appears a dead end 17 Mar 2017
+                     #df_all_but_clinic <- df_master1[df_master1$ClinicName!=clinic_name,]
                      #need to add 1 to index because the first row of the googlesheet is a header row, not data
                      idx_start_old <- match(clinic_name,df_master1$ClinicName)
                      nrec_clinic_old <- length(df_master1$ClinicName[df_master1$ClinicName==clinic_name])
