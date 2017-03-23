@@ -87,12 +87,20 @@ observeEvent(input$Update1,{
                             toggle = 'close')  
                      df_clinicA <- df_clinic()
                      clinic_name <- df_clinicA$ClinicName[1]
-                     #delete clinic records from the master file
-                     df_all_but_clinic <- df_master1[df_master1$ClinicName!=clinic_name,]
+                     #delete clinic records from the master file 
+                     # this next assignment appears a dead end 17 Mar 2017
+                     #df_all_but_clinic <- df_master1[df_master1$ClinicName!=clinic_name,]
+                     
                      #need to add 1 to index because the first row of the googlesheet is a header row, not data
                      idx_start_old <- match(clinic_name,df_master1$ClinicName)
+                     
+                     # This will always be 36, and is used for checking correct number of rows
                      nrec_clinic_old <- length(df_master1$ClinicName[df_master1$ClinicName==clinic_name])
-                     idx_end_old <- idx_start_old + nrec_clinic_old-1  #
+                     
+                      # just use first 20 for speed, using it as a variable because we want to select that number of rows from the uploaded file
+                     nrec_to_use <- 20
+                     
+                     idx_end_old <- idx_start_old + nrec_to_use - 1  #idx_start_old + nrec_clinic_old-1
                      
                      #get the index of records for clinic in df_clinic
                      nrec_clinic_new <- nrow(df_clinicA)
@@ -105,8 +113,9 @@ observeEvent(input$Update1,{
                      gsobj <- gs_key(x=gskey2)
                      #define the cell in the first row of the clinic's records in df_master1 and the google sheet
                      anchor1 <- paste0("A",as.character(idx_start_old+1))
+                    
+                     df_clinicA <-df_clinicA[1:nrec_to_use,]
                      
-            
                      if(isTRUE(base::all.equal(nrec_clinic_old,nrec_clinic_new))) {
                        #since the new record set has same number of rows as old record set, simply replace old with new df
                        gs_edit_cells(ss=gsobj,ws="Summary_Data",input=df_clinicA,col_names=FALSE,anchor=anchor1)
