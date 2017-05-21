@@ -97,10 +97,12 @@ observeEvent(input$Update1,{
                      # This will always be 36, and is used for checking correct number of rows
                      nrec_clinic_old <- length(df_master1$ClinicName[df_master1$ClinicName==clinic_name])
                      
-                      # just use first 20 for speed, using it as a variable because we want to select that number of rows from the uploaded file
-                     nrec_to_use <- 20
+                      # March 2017:  just use first 20 for speed, using it as a variable because we want to select that number of rows from the uploaded file
+                     #May 2017:  use just the 2017 data: 12 records to correctly display goals over the plot range
+                     #need to manually insert records for 2016 using the fix goals in 2016.R script. and 2018 
+                     nrec_to_use <- 12
                      
-                     idx_end_old <- idx_start_old + nrec_to_use - 1  #idx_start_old + nrec_clinic_old-1
+                     idx_end_old <- idx_start_old + 12 + nrec_to_use - 1  #idx_start_old + nrec_clinic_old-1
                      
                      #get the index of records for clinic in df_clinic
                      nrec_clinic_new <- nrow(df_clinicA)
@@ -112,14 +114,16 @@ observeEvent(input$Update1,{
                      
                      gsobj <- gs_key(x=gskey2)
                      #define the cell in the first row of the clinic's records in df_master1 and the google sheet
-                     anchor1 <- paste0("A",as.character(idx_start_old+1))
+                     #anchor cell to start at 2017:  12 rows after 2016, which is defined as idx_start_old + 1
+                     #because the Google Sheet has a header row
+                     anchor1 <- paste0("A",as.character(idx_start_old+12+1))
                     
-                     df_clinicA <-df_clinicA[1:nrec_to_use,]
+                     df_clinicA <-df_clinicA[13:24,]
                      
                      if(isTRUE(base::all.equal(nrec_clinic_old,nrec_clinic_new))) {
                        #since the new record set has same number of rows as old record set, simply replace old with new df
                        gs_edit_cells(ss=gsobj,ws="Summary_Data",input=df_clinicA,col_names=FALSE,anchor=anchor1)
-                       df_master1[idx_start_old:idx_end_old,] <- df_clinicA
+                       df_master1[(idx_start_old+12):idx_end_old,] <- df_clinicA
                      } else cat(file=stderr(),"records of uploaded file do not match master file")
                      #now create the revised dataframe to use in plotting and summaries by the Shiny app         
                      df_new <- df_master1
