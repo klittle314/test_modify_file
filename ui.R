@@ -20,7 +20,7 @@ shinyUI(navbarPage("NNOHA Collaborative Data Web Application",
       em(
         span("Created by "),
         a("Kevin Little", href = "mailto:klittle@iecodesign.com"),
-        span("updated 22 March 2017"),
+        span("updated 21 May 2017"),
         br(), br()
       )
     )
